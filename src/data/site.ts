@@ -45,9 +45,9 @@ export const site = {
 
   /**
    * Exact GPS position of the clinic (from the Google Business Profile: right-click the pin → copy coordinates).
-   * TODO: renseigner, ex. { lat: 33.8xxx, lng: -4.8xxx } — ajouté automatiquement au balisage schema.org.
+   * Source : fiche Google Maps du cabinet — ajouté automatiquement au balisage schema.org.
    */
-  geo: null as { lat: number; lng: number } | null,
+  geo: { lat: 33.828063, lng: -4.836093 } as { lat: number; lng: number } | null,
 
   /** Towns served — used in structured data (areaServed) and the footer for local search. */
   areaServed: ['Sefrou', 'Bhalil', 'Imouzzer Kandar', 'El Menzel', 'Aïn Cheggag', 'Fès'],
