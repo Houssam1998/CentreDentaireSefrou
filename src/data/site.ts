@@ -28,7 +28,7 @@ export const site = {
   phoneHref: 'tel:+212535682056',
   whatsapp: '212666060215', // format international sans "+" ni espaces, utilisé par wa.me
   whatsappDisplay: '06 66 06 02 15',
-  email: 'contact@centredentairesefrou.com', // TODO: créer l'adresse (Cloudflare Email Routing) ou la remplacer
+  email: 'centredentairesefrou@gmail.com', // TODO: confirmer l'adresse e-mail du cabinet
 
   // Adresse issue de la fiche Google Maps du cabinet
   address: {
@@ -38,10 +38,10 @@ export const site = {
     country: 'MA',
   },
   /** Google Maps listing (shared link) — used for "Itinéraire", reviews and schema.org `hasMap`. */
-  mapsUrl: 'https://maps.app.goo.gl/ixcJbkZbMx7wiShj6',
+  mapsUrl: 'https://maps.app.goo.gl/tCKEdeicvFQSDHrHA',
   /** Query used by the embedded map; resolves to the Google listing. */
   mapsQuery: 'Centre Dentaire Sefrou, N464 Derb El Miter, Sefrou 31000',
-  googleReviewsUrl: 'https://maps.app.goo.gl/ixcJbkZbMx7wiShj6',
+  googleReviewsUrl: 'https://maps.app.goo.gl/tCKEdeicvFQSDHrHA',
 
   /**
    * Exact GPS position of the clinic (from the Google Business Profile: right-click the pin → copy coordinates).
