@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  text?: string;
+  image: ImageMetadata;
+  /** Breadcrumb trail; the last item is the current page. */
+  crumbs: { name: string; href: string }[];
+  imagePosition?: string;
+}
+const { title, eyebrow, text, image, crumbs, imagePosition = 'center' } = Astro.props;
+---
+
+<section class="relative isolate flex min-h-[26rem] items-end overflow-hidden bg-ink text-white md:min-h-[32rem] lg:min-h-[36rem]">
+  <div class="absolute inset-0 -z-10" data-parallax>
+    <Image
+      src={image}
+      alt=""
+      widths={[640, 1024, 1600, 2000]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="size-full scale-105 object-cover"
+      style={`object-position:${imagePosition}`}
+    />
+  </div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/60 to-ink/35"></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink/70 to-transparent"></div>
+
+  <div class="container-site pt-32 pb-12 md:pb-16">
+    <nav aria-label="Breadcrumb" data-hero-line>
+      <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white/65">
+        {
+          crumbs.map((c, i) => (
+            <li class="flex items-center gap-2">
+              {i > 0 && <Icon name="arrowRight" class="size-3.5 text-accent" />}
+              {i < crumbs.length - 1 ? (
+                <a href={c.href} class="inline-flex min-h-11 items-center hover:text-white">{c.name}</a>
+              ) : (
+                <span aria-current="page" class="text-white">{c.name}</span>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    {eyebrow && <p class="eyebrow eyebrow-light mt-8" data-hero-line>{eyebrow}</p>}
+    <h1 class:list={['h-display max-w-4xl [&_em]:text-accent [&_em]:italic', eyebrow ? 'mt-4' : 'mt-6']} data-hero-line set:html={title} />
+    {text && <p class="mt-5 max-w-2xl text-[1.05rem] text-white/80 sm:text-lg" data-hero-line>{text}</p>}
+    <slot />
+  </div>
+</section>

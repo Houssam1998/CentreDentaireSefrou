@@ -1,0 +1,42 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const items = {
+  fr: [
+    { icon: 'cpu', title: 'Équipement moderne', text: 'Radiographie panoramique 3D (CBCT) et scanner intra-oral sur place.' },
+    { icon: 'shield', title: 'Stérilisation stricte', text: 'Protocoles d’hygiène rigoureux à chaque étape.' },
+    { icon: 'heart', title: 'Soins en douceur', text: 'Votre confort et votre sérénité avant tout.' },
+    { icon: 'smile', title: 'Pour toute la famille', text: 'Un suivi bucco-dentaire attentif, à chaque âge.' },
+  ],
+  en: [
+    { icon: 'cpu', title: 'Modern equipment', text: 'On-site 3D panoramic CBCT and intraoral scanner.' },
+    { icon: 'shield', title: 'Strict sterilisation', text: 'Rigorous hygiene protocols at every step.' },
+    { icon: 'heart', title: 'Gentle care', text: 'Your comfort and peace of mind come first.' },
+    { icon: 'smile', title: 'For the whole family', text: 'Attentive dental follow-up at every age.' },
+  ],
+}[lang] as { icon: 'cpu' | 'shield' | 'heart' | 'smile'; title: string; text: string }[];
+---
+
+<section class="relative z-10 -mt-12 md:-mt-14">
+  <div class="container-site">
+    <ul class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line shadow-lift lg:grid-cols-4" data-reveal-group>
+      {
+        items.map((item) => (
+          <li class="bg-white p-5 sm:p-7" data-reveal>
+            <span class="inline-flex size-11 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+              <Icon name={item.icon} class="size-[1.35rem]" />
+            </span>
+            <p class="mt-4 font-medium leading-snug">{item.title}</p>
+            <p class="mt-1.5 hidden text-sm text-muted sm:block">{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,64 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import TrustBar from '@/components/home/TrustBar.astro';
+import DoctorIntro from '@/components/home/DoctorIntro.astro';
+import ServiceCards from '@/components/home/ServiceCards.astro';
+import Stats from '@/components/home/Stats.astro';
+import CaseStudy from '@/components/home/CaseStudy.astro';
+import Process from '@/components/home/Process.astro';
+import Testimonials from '@/components/home/Testimonials.astro';
+import Gallery from '@/components/home/Gallery.astro';
+import FaqSection from '@/components/home/FaqSection.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import CtaStrip from '@/components/ui/CtaStrip.astro';
+import { type Lang, routes } from '@/i18n';
+import { cases, generalFaq } from '@/data/content';
+import { faqSchema } from '@/lib/schema';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const meta = {
+  fr: {
+    title: 'Centre Dentaire Sefrou | Dr Amine El Omari — Dentiste à Sefrou',
+    description:
+      'Cabinet dentaire à Sefrou : implants, facettes, aligneurs, blanchiment, smile design, soins généraux, ronflement et bruxisme. Prenez rendez-vous avec le Dr Amine El Omari par téléphone ou WhatsApp.',
+    strip1: 'Une question sur un soin ? Parlons-en ensemble.',
+    strip2: 'Envie d’un sourire transformé ? Contactez-nous.',
+  },
+  en: {
+    title: 'Centre Dentaire Sefrou | Dr Amine El Omari — Dentist in Sefrou',
+    description:
+      'Dental clinic in Sefrou: implants, veneers, clear aligners, whitening, smile design, general dentistry, snoring and bruxism. Book with Dr Amine El Omari by phone or WhatsApp.',
+    strip1: 'A question about a treatment? Let’s talk.',
+    strip2: 'Dreaming of a new smile? Get in touch.',
+  },
+}[lang];
+
+const faq = generalFaq[lang];
+---
+
+<BaseLayout
+  lang={lang}
+  title={meta.title}
+  description={meta.description}
+  alternate={routes.home[lang === 'fr' ? 'en' : 'fr']}
+  schema={[faqSchema(faq)]}
+>
+  <Hero lang={lang} />
+  <TrustBar lang={lang} />
+  <DoctorIntro lang={lang} />
+  <ServiceCards lang={lang} />
+  <CtaStrip lang={lang} text={meta.strip1} tone="sand" />
+  <Stats lang={lang} />
+  <CaseStudy lang={lang} item={cases[0]} tone="light" />
+  <CtaStrip lang={lang} text={meta.strip2} />
+  <Process lang={lang} />
+  <Testimonials lang={lang} />
+  <Gallery lang={lang} />
+  <FaqSection lang={lang} items={faq} />
+  <ContactSection lang={lang} />
+</BaseLayout>

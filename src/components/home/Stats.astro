@@ -1,0 +1,49 @@
+---
+import type { Lang } from '@/i18n';
+import { site } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const labels = {
+  fr: { years: "Années d'expérience", trainings: 'Diplôme & formations', rating: `Note Google · ${site.stats.reviews} avis`, opened: 'Ouverture du centre' },
+  en: { years: 'Years of experience', trainings: 'Degree & trainings', rating: `Google rating · ${site.stats.reviews} reviews`, opened: 'Centre opened' },
+}[lang];
+
+const stats: { value: number; suffix: string; label: string; decimals?: number; animate?: boolean }[] = [
+  { value: site.stats.years, suffix: '+', label: labels.years },
+  { value: site.stats.trainings, suffix: '', label: labels.trainings },
+  { value: site.stats.rating, suffix: '/5', label: labels.rating, decimals: 1 },
+  { value: site.stats.openedYear, suffix: '', label: labels.opened, animate: false },
+];
+
+const fmt = (n: number, decimals = 0, grouping = true) => n.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: grouping });
+---
+
+<section class="relative overflow-hidden bg-ink py-16 text-white md:py-20">
+  <svg class="pointer-events-none absolute inset-0 size-full text-white/[0.035]" preserveAspectRatio="none" viewBox="0 0 1200 300" fill="none" aria-hidden="true">
+    {Array.from({ length: 10 }, (_, i) => <path d={`M0 ${40 + i * 24} C 300 ${-20 + i * 30}, 700 ${180 + i * 10}, 1200 ${30 + i * 26}`} stroke="currentColor" />)}
+  </svg>
+  <div class="container-site relative">
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4" data-reveal-group>
+      {
+        stats.map((s) => (
+          <div class="border-l border-accent/40 pl-5 sm:pl-6" data-reveal>
+            <dt class="sr-only">{s.label}</dt>
+            <dd class="font-serif text-[2.6rem] leading-none text-white sm:text-6xl">
+              {s.animate === false ? (
+                <span>{fmt(s.value, 0, false)}</span>
+              ) : (
+                <span data-count={s.value} data-decimals={s.decimals ?? 0} data-locale={lang === 'fr' ? 'fr-FR' : 'en-US'}>{fmt(s.value, s.decimals)}</span>
+              )}
+              <span class="text-accent">{s.suffix}</span>
+            </dd>
+            <dd class="mt-3 text-sm text-white/65 sm:text-[0.95rem]" aria-hidden="true">{s.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

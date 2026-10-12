@@ -1,0 +1,87 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import { type Lang, path } from '@/i18n';
+import { site } from '@/data/site';
+import doctorImg from '@/assets/media/clinic/doctor-standing.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  fr: {
+    eyebrow: 'Le Docteur',
+    role: 'Chirurgien-dentiste',
+    alt: 'Le Dr Amine El Omari au Centre Dentaire Sefrou',
+    text: [
+      'Diplômé en médecine dentaire en 2020, le Dr Amine El Omari a exercé pendant plus de cinq ans dans des cabinets de Fès, Rabat et Sefrou avant d’ouvrir le Centre Dentaire Sefrou le 22 juin 2026.',
+      'Formé en prothèse, endodontie, esthétique, chirurgie buccale et parodontologie, il réunit au même endroit implants, esthétique du sourire et soins du quotidien, avec des outils numériques : radiographie panoramique 3D (CBCT), empreintes optiques et conception 3D du sourire.',
+    ],
+    quote: '« Un beau sourire commence par la confiance. »',
+    points: ['Diplôme de médecin-dentiste (2020)', '5 formations approfondies (2021–2022)', 'Consultations en arabe, français et anglais'],
+    years: "ans d'expérience",
+    link: 'Découvrir le parcours du docteur',
+  },
+  en: {
+    eyebrow: 'The Doctor',
+    role: 'Dental surgeon',
+    alt: 'Dr Amine El Omari at Centre Dentaire Sefrou',
+    text: [
+      'A dental graduate since 2020, Dr Amine El Omari practised for more than five years in clinics in Fès, Rabat and Sefrou before opening Centre Dentaire Sefrou on 22 June 2026.',
+      'Trained in prosthetics, endodontics, aesthetics, oral surgery and periodontics, he brings implants, smile aesthetics and everyday care together under one roof, using digital tools: 3D panoramic CBCT imaging, optical impressions and 3D smile design.',
+    ],
+    quote: '“A beautiful smile starts with trust.”',
+    points: ['Dental surgeon degree (2020)', '5 in-depth training courses (2021–2022)', 'Consultations in Arabic, French and English'],
+    years: 'years of experience',
+    link: 'Discover the doctor’s background',
+  },
+}[lang];
+---
+
+<section class="section overflow-hidden">
+  <div class="container-site grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+    <div class="relative mx-auto w-full max-w-md lg:max-w-none" data-reveal>
+      <div class="absolute -inset-3 translate-x-5 translate-y-5 rounded-[2rem] border border-accent sm:-inset-4 sm:translate-x-7 sm:translate-y-7" aria-hidden="true"></div>
+      <div class="relative overflow-hidden rounded-[2rem] bg-sand">
+        <Image
+          src={doctorImg}
+          alt={copy.alt}
+          widths={[420, 640, 900]}
+          sizes="(min-width: 1024px) 40vw, 90vw"
+          class="aspect-[4/5] w-full object-cover object-[50%_20%]"
+          data-img-reveal
+        />
+      </div>
+      <div class="absolute -bottom-6 -left-2 rounded-2xl bg-ink px-6 py-5 text-white shadow-lift sm:-left-6">
+        <p class="font-serif text-5xl leading-none text-accent"><span data-count={site.stats.years}>{site.stats.years}</span>+</p>
+        <p class="mt-1.5 text-sm text-white/75">{copy.years}</p>
+      </div>
+    </div>
+
+    <div>
+      <p class="eyebrow" data-reveal>{copy.eyebrow}</p>
+      <h2 class="h-section mt-4" data-reveal>{site.doctor}</h2>
+      <p class="mt-2 text-sm font-medium tracking-[0.16em] text-accent-dark uppercase" data-reveal>{copy.role}</p>
+      <div class="lead mt-7 space-y-4" data-reveal>
+        {copy.text.map((p) => <p>{p}</p>)}
+      </div>
+      <blockquote class="mt-8 border-l-2 border-accent pl-5 font-serif text-2xl italic leading-snug" data-reveal>{copy.quote}</blockquote>
+      <ul class="mt-8 grid gap-3" data-reveal>
+        {
+          copy.points.map((p) => (
+            <li class="flex items-center gap-3">
+              <Icon name="checkCircle" class="size-5 shrink-0 text-primary" />
+              {p}
+            </li>
+          ))
+        }
+      </ul>
+      <a href={path('doctor', lang)} class="link-arrow mt-9" data-reveal>
+        {copy.link}
+        <Icon name="arrowRight" />
+      </a>
+    </div>
+  </div>
+</section>

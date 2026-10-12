@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import BeforeAfterSlider from '@/components/ui/BeforeAfterSlider.astro';
+import ScannerVideo from '@/components/ui/ScannerVideo.astro';
+import { type Lang, path } from '@/i18n';
+import type { Case } from '@/data/content';
+import { site } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  item: Case;
+  tone?: 'dark' | 'light';
+}
+const { lang, item, tone = 'dark' } = Astro.props;
+const intra = item.views[item.views.length - 1];
+const [designMain, ...designThumbs] = item.design ?? [];
+
+const copy = {
+  fr: {
+    eyebrow: `Cas réel · ${site.doctor}`,
+    title: 'Du projet <em>numérique</em><br /> au sourire final',
+    text: item.text.fr,
+    steps: [
+      { title: 'Situation initiale', text: 'Incisives colorées et abîmées, avec un espace entre les dents de devant.' },
+      { title: 'Conception numérique', text: 'Les futures dents sont modélisées en 3D (Digital Smile Design) pour valider forme, longueur et alignement avant tout geste.' },
+      { title: 'Résultat', text: 'Quatre restaurations sur mesure : teinte naturelle, espace refermé et sourire harmonieux.' },
+    ],
+    compare: 'Comparez par vous-même',
+    cta: 'Voir les avant / après',
+    consent: 'Chaque résultat dépend de la situation de départ.',
+  },
+  en: {
+    eyebrow: `Real case · ${site.doctor}`,
+    title: 'From <em>digital</em> design<br /> to the final smile',
+    text: item.text.en,
+    steps: [
+      { title: 'Initial situation', text: 'Discoloured, damaged front teeth with a gap between the central incisors.' },
+      { title: 'Digital design', text: 'The future teeth are modelled in 3D (Digital Smile Design) to validate shape, length and alignment before any treatment.' },
+      { title: 'Result', text: 'Four custom restorations: natural shade, gap closed and a harmonious smile.' },
+    ],
+    compare: 'Compare for yourself',
+    cta: 'See before / after',
+    consent: 'Every result depends on the starting situation.',
+  },
+}[lang];
+
+const dark = tone === 'dark';
+---
+
+<section class:list={['section', dark ? 'bg-ink text-white' : 'bg-sand']}>
+  <div class="container-site">
+    <div class="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-end lg:gap-16" data-reveal>
+      <div>
+        <p class:list={['eyebrow', dark && 'eyebrow-light']}>{copy.eyebrow}</p>
+        <h2 class:list={['h-section mt-4 [&_em]:italic', dark ? '[&_em]:text-accent' : '[&_em]:text-primary']} set:html={copy.title} />
+      </div>
+      <p class:list={['lead', dark && '!text-white/70']}>{copy.text}</p>
+    </div>
+
+    <!-- 3-step story: swipeable on phones, 3 columns from lg -->
+    <ol class="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 no-scrollbar md:-mx-8 md:scroll-px-8 md:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0">
+      {
+        copy.steps.map((step, i) => (
+          <li class:list={['flex w-[84%] shrink-0 snap-start flex-col overflow-hidden rounded-3xl sm:w-[60%] lg:w-auto', dark ? 'bg-white/[0.05] ring-1 ring-white/10' : 'bg-white shadow-soft']} data-reveal>
+            <div class="relative aspect-[4/3] overflow-hidden">
+              {i === 0 && <Image src={intra.before} alt={`${item.title[lang]} — ${step.title}`} widths={[400, 700]} sizes="(min-width: 1024px) 30vw, 84vw" class="size-full object-cover" />}
+              {i === 1 && designMain && (
+                <>
+                  <Image src={designMain} alt={`${step.title} — Digital Smile Design`} widths={[400, 700]} sizes="(min-width: 1024px) 30vw, 84vw" class="size-full object-cover object-[50%_40%]" />
+                  <div class="absolute right-3 bottom-3 flex gap-2">
+                    {designThumbs.map((img) => (
+                      <Image src={img} alt="" widths={[160]} sizes="5rem" class="size-16 rounded-xl border-2 border-white object-cover shadow-lift sm:size-20" />
+                    ))}
+                  </div>
+                </>
+              )}
+              {i === 2 && <Image src={intra.after} alt={`${item.title[lang]} — ${step.title}`} widths={[400, 700]} sizes="(min-width: 1024px) 30vw, 84vw" class="size-full object-cover" />}
+              <span class="absolute top-3 left-3 inline-flex size-10 items-center justify-center rounded-full bg-ink/75 font-serif text-lg text-accent backdrop-blur">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </div>
+            <div class="p-6">
+              <h3 class="font-serif text-2xl">{step.title}</h3>
+              <p class:list={['mt-2 text-[0.95rem]', dark ? 'text-white/70' : 'text-muted']}>{step.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- The scanner used for the digital impression behind this case -->
+    <div class="mt-10">
+      <ScannerVideo lang={lang} tone={tone} />
+    </div>
+
+    <div class="mx-auto mt-14 max-w-3xl">
+      <p class="mb-4 text-center font-serif text-2xl" data-reveal>{copy.compare}</p>
+      <BeforeAfterSlider lang={lang} item={item} caption={false} />
+      <div class="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row" data-reveal>
+        <p class:list={['text-xs', dark ? 'text-white/50' : 'text-muted']}>{copy.consent}</p>
+        <a href={path('beforeAfter', lang)} class:list={['link-arrow', dark && '!text-accent']}>{copy.cta}<Icon name="arrowRight" /></a>
+      </div>
+    </div>
+  </div>
+</section>

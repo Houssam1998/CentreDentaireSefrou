@@ -1,0 +1,34 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import { type Lang, treatmentPath } from '@/i18n';
+import type { Treatment } from '@/data/treatments';
+
+interface Props {
+  lang: Lang;
+  treatment: Treatment;
+}
+const { lang, treatment } = Astro.props;
+const c = treatment[lang];
+---
+
+<a href={treatmentPath(c.slug, lang)} class="group card flex flex-col overflow-hidden transition-shadow duration-500 hover:shadow-lift" data-reveal>
+  <div class="overflow-hidden">
+    <Image
+      src={treatment.image}
+      alt=""
+      widths={[400, 640]}
+      sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+      class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+    />
+  </div>
+  <div class="flex flex-1 items-end justify-between gap-4 p-6">
+    <div>
+      <h3 class="font-serif text-2xl">{c.title}</h3>
+      <p class="mt-1 text-sm text-muted">{c.tagline}</p>
+    </div>
+    <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-line transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
+      <Icon name="arrowUpRight" class="size-4" />
+    </span>
+  </div>
+</a>

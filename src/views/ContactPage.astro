@@ -1,0 +1,45 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import FaqSection from '@/components/home/FaqSection.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { generalFaq } from '@/data/content';
+import { breadcrumbSchema, faqSchema } from '@/lib/schema';
+import heroImage from '@/assets/media/clinic/waiting-room.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: {
+    seoTitle: 'Contact & rendez-vous | Centre Dentaire Sefrou',
+    seoDesc: 'Prenez rendez-vous au Centre Dentaire Sefrou par téléphone, WhatsApp ou formulaire. Adresse, horaires et itinéraire.',
+    eyebrow: 'Contact',
+    title: 'Prenons <em>rendez-vous</em>',
+    text: 'Par téléphone, sur WhatsApp ou via le formulaire : nous vous répondons rapidement.',
+  },
+  en: {
+    seoTitle: 'Contact & appointments | Centre Dentaire Sefrou',
+    seoDesc: 'Book an appointment at Centre Dentaire Sefrou by phone, WhatsApp or form. Address, opening hours and directions.',
+    eyebrow: 'Contact',
+    title: 'Let’s book your <em>appointment</em>',
+    text: 'By phone, on WhatsApp or through the form: we reply quickly.',
+  },
+}[lang];
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: t('nav.contact'), href: path('contact', lang) },
+];
+const faq = generalFaq[lang];
+---
+
+<BaseLayout lang={lang} title={copy.seoTitle} description={copy.seoDesc} alternate={routes.contact[lang === 'fr' ? 'en' : 'fr']} schema={[faqSchema(faq), breadcrumbSchema(crumbs, Astro.site)]}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.title} text={copy.text} image={heroImage} crumbs={crumbs} />
+  <ContactSection lang={lang} heading={false} />
+  <FaqSection lang={lang} items={faq} />
+</BaseLayout>

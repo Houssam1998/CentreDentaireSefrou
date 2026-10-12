@@ -1,0 +1,82 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/i18n';
+import { site } from '@/data/site';
+import poster from '@/assets/media/clinic/treatment-room-1.jpg';
+
+interface Props {
+  lang: Lang;
+  tone?: 'dark' | 'light';
+}
+const { lang, tone = 'light' } = Astro.props;
+const dark = tone === 'dark';
+const name = site.scannerVideo.name;
+
+const copy = {
+  fr: {
+    eyebrow: 'Empreinte numérique',
+    title: `Le scanner intra-oral <em>${name}</em>`,
+    text: 'Au lieu de la pâte à empreinte, une petite caméra enregistre vos dents en 3D en quelques instants. Ce modèle numérique sert de base à la conception du sourire, aux couronnes, aux aligneurs et aux gouttières.',
+    points: ['Sans pâte à empreinte, plus confortable', 'Modèle 3D de vos dents visible à l’écran', 'Précision et ajustement des travaux sur mesure'],
+    play: 'Voir le scanner en action',
+    source: 'Vidéo de présentation du fabricant (BLZ Dental) · YouTube',
+    videoTitle: `Scanner intra-oral ${name} — présentation`,
+  },
+  en: {
+    eyebrow: 'Digital impression',
+    title: `The <em>${name}</em> intraoral scanner`,
+    text: 'Instead of impression paste, a small camera records your teeth in 3D in moments. This digital model is the basis for smile design, crowns, aligners and night guards.',
+    points: ['No impression paste, more comfortable', 'A 3D model of your teeth on screen', 'Precise, well-fitting custom work'],
+    play: 'See the scanner in action',
+    source: 'Manufacturer presentation video (BLZ Dental) · YouTube',
+    videoTitle: `${name} intraoral scanner — presentation`,
+  },
+}[lang];
+---
+
+<div class:list={['grid items-center gap-8 rounded-3xl p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:p-10', dark ? 'bg-white/[0.05] ring-1 ring-white/10' : 'bg-white shadow-soft']} data-reveal>
+  <div>
+    <p class:list={['eyebrow', dark && 'eyebrow-light']}>{copy.eyebrow}</p>
+    <h3 class:list={['mt-3 font-serif text-3xl leading-tight sm:text-4xl [&_em]:italic', dark ? '[&_em]:text-accent' : '[&_em]:text-primary']} set:html={copy.title} />
+    <p class:list={['mt-4', dark ? 'text-white/70' : 'text-muted']}>{copy.text}</p>
+    <ul class="mt-5 grid gap-2.5">
+      {
+        copy.points.map((p) => (
+          <li class="flex items-center gap-3 text-[0.95rem]">
+            <Icon name="checkCircle" class:list={['size-5 shrink-0', dark ? 'text-accent' : 'text-primary']} />
+            {p}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <figure>
+    <div
+      data-video-facade
+      data-video-id={site.scannerVideo.id}
+      data-video-title={copy.videoTitle}
+      class="relative aspect-video overflow-hidden rounded-2xl bg-ink"
+    >
+      <button type="button" data-video-play class="group absolute inset-0 size-full" aria-label={`${copy.play} — ${copy.videoTitle}`}>
+        <Image
+          src={poster}
+          alt=""
+          widths={[480, 800, 1100]}
+          sizes="(min-width: 1024px) 40vw, 92vw"
+          class="absolute inset-0 size-full object-cover object-[86%_55%] transition-transform duration-700 group-hover:scale-105"
+        />
+        <span class="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent"></span>
+        <span class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white">
+          <span class="relative inline-flex size-16 items-center justify-center rounded-full bg-white text-ink shadow-lift transition-transform duration-300 group-hover:scale-110 sm:size-20">
+            <span class="absolute inset-0 animate-ping rounded-full bg-white opacity-25 [animation-duration:2.4s]"></span>
+            <Icon name="play" class="relative ml-1 size-7 sm:size-8" />
+          </span>
+          <span class="font-medium">{copy.play}</span>
+        </span>
+      </button>
+    </div>
+    <figcaption class:list={['mt-2 text-xs', dark ? 'text-white/50' : 'text-muted']}>{copy.source}</figcaption>
+  </figure>
+</div>

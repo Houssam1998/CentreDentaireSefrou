@@ -1,0 +1,104 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/i18n';
+import { site } from '@/data/site';
+import { treatments } from '@/data/treatments';
+
+interface Props {
+  lang: Lang;
+  /** Pre-selects a treatment (treatment pages). */
+  selected?: string;
+}
+const { lang, selected } = Astro.props;
+
+const copy = {
+  fr: {
+    title: 'Demande de rendez-vous',
+    text: 'Remplissez ce formulaire : il s’ouvrira dans WhatsApp, prêt à être envoyé.',
+    name: 'Nom complet',
+    phone: 'Téléphone',
+    treatment: 'Soin souhaité',
+    other: 'Consultation / autre',
+    date: 'Date souhaitée',
+    message: 'Message',
+    messagePh: 'Décrivez brièvement votre besoin (facultatif)',
+    sendWa: 'Envoyer via WhatsApp',
+    sendMail: 'ou par e-mail',
+    intro: 'Bonjour, je souhaite prendre rendez-vous au Centre Dentaire Sefrou.',
+    subject: 'Demande de rendez-vous',
+    success: 'Merci ! Votre message est prêt : il ne reste plus qu’à l’envoyer.',
+    privacy: 'Vos informations servent uniquement à vous recontacter.',
+  },
+  en: {
+    title: 'Appointment request',
+    text: 'Fill in this form: it will open in WhatsApp, ready to send.',
+    name: 'Full name',
+    phone: 'Phone',
+    treatment: 'Treatment',
+    other: 'Consultation / other',
+    date: 'Preferred date',
+    message: 'Message',
+    messagePh: 'Briefly describe your need (optional)',
+    sendWa: 'Send via WhatsApp',
+    sendMail: 'or by email',
+    intro: 'Hello, I would like to book an appointment at Centre Dentaire Sefrou.',
+    subject: 'Appointment request',
+    success: 'Thank you! Your message is ready — just press send.',
+    privacy: 'Your details are only used to get back to you.',
+  },
+}[lang];
+
+const today = new Date().toISOString().slice(0, 10);
+const field =
+  'mt-2 block min-h-12 w-full rounded-2xl border border-line bg-ivory px-4 text-base text-ink transition-colors placeholder:text-muted/70 focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10';
+---
+
+<form
+  data-contact-form
+  data-whatsapp={site.whatsapp}
+  data-email={site.email}
+  data-intro={copy.intro}
+  data-subject={copy.subject}
+  data-success={copy.success}
+  class="card p-6 sm:p-9"
+>
+  <h3 class="font-serif text-3xl">{copy.title}</h3>
+  <p class="mt-2 text-muted">{copy.text}</p>
+
+  <div class="mt-8 grid gap-5 sm:grid-cols-2">
+    <label class="block">
+      <span class="text-sm font-medium">{copy.name} *</span>
+      <input name="name" data-field-label={copy.name} required autocomplete="name" class={field} />
+    </label>
+    <label class="block">
+      <span class="text-sm font-medium">{copy.phone} *</span>
+      <input name="phone" data-field-label={copy.phone} type="tel" inputmode="tel" required autocomplete="tel" pattern="[0-9+()\s.\-]{8,}" placeholder="06 00 00 00 00" class={field} />
+    </label>
+    <label class="block">
+      <span class="text-sm font-medium">{copy.treatment}</span>
+      <select name="treatment" data-field-label={copy.treatment} class:list={[field, 'appearance-none bg-[url(/brand/chevron.svg)] bg-[length:1rem] bg-[right_1rem_center] bg-no-repeat pr-10']}>
+        <option value={copy.other}>{copy.other}</option>
+        {treatments.map((tr) => <option value={tr[lang].title} selected={tr.id === selected}>{tr[lang].title}</option>)}
+      </select>
+    </label>
+    <label class="block">
+      <span class="text-sm font-medium">{copy.date}</span>
+      <input name="date" data-field-label={copy.date} type="date" min={today} class={field} />
+    </label>
+    <label class="block sm:col-span-2">
+      <span class="text-sm font-medium">{copy.message}</span>
+      <textarea name="message" data-field-label={copy.message} rows="4" placeholder={copy.messagePh} class:list={[field, 'py-3']}></textarea>
+    </label>
+  </div>
+
+  <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button type="submit" data-channel="whatsapp" class="btn btn-whatsapp w-full sm:w-auto" data-cta="form-whatsapp">
+      <Icon name="whatsapp" />{copy.sendWa}
+    </button>
+    <button type="submit" data-channel="email" class="btn btn-outline w-full sm:w-auto" data-cta="form-email">
+      <Icon name="mail" />{copy.sendMail}
+    </button>
+  </div>
+  <p data-form-status hidden role="status" class="mt-5 rounded-2xl bg-primary-soft px-4 py-3 text-sm text-primary-dark"></p>
+  <p class="mt-5 text-xs text-muted">{copy.privacy}</p>
+</form>

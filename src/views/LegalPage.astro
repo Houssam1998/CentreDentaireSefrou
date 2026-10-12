@@ -1,0 +1,62 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { site, fullAddress } from '@/data/site';
+import heroImage from '@/assets/media/tools-detail.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+// The cookie paragraph adapts automatically when measurement IDs are configured in site.ts
+const tracking = Boolean(site.analytics.ga4 || site.analytics.googleAds);
+
+// TODO: faire valider ce texte (identifiants professionnels, hébergeur, déclaration CNDP)
+const copy = {
+  fr: {
+    seoTitle: 'Mentions légales | Centre Dentaire Sefrou',
+    title: 'Mentions légales',
+    sections: [
+      { h: 'Éditeur du site', p: [`${site.name} — ${site.doctorFull}, chirurgien-dentiste.`, `Adresse : ${fullAddress}.`, `Téléphone : ${site.phone} — E-mail : ${site.email}.`, 'Numéro d’inscription à l’Ordre : à compléter.'] },
+      { h: 'Hébergement', p: ['Hébergeur : à compléter (nom, adresse).'] },
+      { h: 'Données personnelles', p: ['Les informations transmises via le formulaire de contact ou WhatsApp sont utilisées uniquement pour répondre à votre demande et organiser votre rendez-vous. Elles ne sont ni vendues ni cédées à des tiers.', 'Conformément à la loi n° 09-08 relative à la protection des personnes physiques à l’égard du traitement des données à caractère personnel, vous disposez d’un droit d’accès, de rectification et d’opposition. Pour l’exercer, contactez-nous à l’adresse ci-dessus.'] },
+      { h: 'Cookies et services tiers', p: [tracking ? 'Ce site utilise les services de mesure de Google (Google Analytics / Google Ads) afin de connaître la fréquentation des pages et l’efficacité des demandes de rendez-vous. Ces services peuvent déposer des cookies sur votre appareil.' : 'Ce site n’utilise ni cookies publicitaires ni outil de mesure d’audience.', 'La carte Google Maps et la vidéo YouTube ne sont chargées que si vous cliquez dessus ; Google peut alors déposer ses propres cookies. La prise de rendez-vous en ligne s’effectue sur la plateforme Dentisto, soumise à ses propres conditions.'] },
+      { h: 'Contenus et images', p: ['Les informations médicales présentées sur ce site sont fournies à titre informatif et ne remplacent pas une consultation. Certaines photographies sont des images d’illustration.'] },
+    ],
+  },
+  en: {
+    seoTitle: 'Legal notice | Centre Dentaire Sefrou',
+    title: 'Legal notice',
+    sections: [
+      { h: 'Publisher', p: [`${site.name} — ${site.doctorFull}, dental surgeon.`, `Address: ${fullAddress}.`, `Phone: ${site.phone} — Email: ${site.email}.`, 'Professional registration number: to be completed.'] },
+      { h: 'Hosting', p: ['Hosting provider: to be completed (name, address).'] },
+      { h: 'Personal data', p: ['Information sent via the contact form or WhatsApp is used only to answer your request and arrange your appointment. It is never sold or shared with third parties.', 'In accordance with Moroccan law 09-08 on the protection of personal data, you have the right to access, correct and object to the processing of your data. To exercise these rights, contact us at the address above.'] },
+      { h: 'Cookies and third-party services', p: [tracking ? 'This site uses Google measurement services (Google Analytics / Google Ads) to understand page visits and the effectiveness of appointment requests. These services may set cookies on your device.' : 'This site uses no advertising cookies and no audience-measurement tool.', 'The Google Maps map and the YouTube video only load when you click them; Google may then set its own cookies. Online booking takes place on the Dentisto platform, subject to its own terms.'] },
+      { h: 'Content and images', p: ['Medical information on this site is provided for information only and does not replace a consultation. Some photographs are illustrative images.'] },
+    ],
+  },
+}[lang];
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: copy.title, href: path('legal', lang) },
+];
+---
+
+<BaseLayout lang={lang} title={copy.seoTitle} description={copy.title} alternate={routes.legal[lang === 'fr' ? 'en' : 'fr']}>
+  <PageHero title={copy.title} image={heroImage} crumbs={crumbs} />
+  <section class="section">
+    <div class="container-site max-w-3xl space-y-12">
+      {
+        copy.sections.map((s) => (
+          <div>
+            <h2 class="font-serif text-3xl">{s.h}</h2>
+            <div class="mt-4 space-y-3 text-muted">{s.p.map((p) => <p>{p}</p>)}</div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

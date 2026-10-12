@@ -1,0 +1,38 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { type Lang, useT } from '@/i18n';
+import { site, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<!-- Always-visible quick actions on phones and tablets -->
+<nav
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-12px_rgb(20_32_43/0.25)] backdrop-blur-lg lg:hidden"
+  aria-label={t('cta.book')}
+>
+  <div class="grid h-[4.25rem] grid-cols-3">
+    <a href={site.phoneHref} class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-ink active:bg-ivory" data-cta="bar-call">
+      <Icon name="phone" class="size-[1.35rem] text-primary" />
+      {t('cta.call')}
+    </a>
+    <a
+      href={whatsappLink(t('whatsapp.greeting'))}
+      target="_blank"
+      rel="noopener"
+      class="flex flex-col items-center justify-center gap-1 border-x border-line text-xs font-medium text-ink active:bg-ivory"
+      data-cta="bar-whatsapp"
+    >
+      <Icon name="whatsapp" class="size-[1.35rem] text-whatsapp" />
+      WhatsApp
+    </a>
+    <a href={site.bookingUrl} target="_blank" rel="noopener" class="m-2 flex flex-col items-center justify-center gap-1 rounded-2xl bg-primary text-xs font-medium text-white active:bg-primary-dark" data-cta="bar-book">
+      <Icon name="calendar" class="size-[1.35rem]" />
+      {t('cta.bookShort')}
+    </a>
+  </div>
+</nav>

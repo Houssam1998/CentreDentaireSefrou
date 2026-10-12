@@ -1,0 +1,25 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  items: { q: string; a: string }[];
+}
+const { items } = Astro.props;
+---
+
+<!-- Native <details>: accessible, works without JS -->
+<div class="divide-y divide-line border-y border-line">
+  {
+    items.map((item, i) => (
+      <details class="group" open={i === 0} data-reveal>
+        <summary class="flex min-h-16 cursor-pointer items-center justify-between gap-6 py-5 text-left text-[1.08rem] font-medium transition-colors hover:text-primary">
+          {item.q}
+          <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-line transition-all duration-300 group-open:rotate-45 group-open:border-primary group-open:bg-primary group-open:text-white">
+            <Icon name="plus" class="size-4" />
+          </span>
+        </summary>
+        <p class="max-w-2xl pr-12 pb-6 text-muted">{item.a}</p>
+      </details>
+    ))
+  }
+</div>

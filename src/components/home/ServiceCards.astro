@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { type Lang, path, treatmentPath, useT } from '@/i18n';
+import { categories, treatmentsByCategory } from '@/data/treatments';
+
+interface Props {
+  lang: Lang;
+  heading?: boolean;
+}
+const { lang, heading = true } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: { eyebrow: 'Nos soins', title: 'Des soins complets,<br /> <em>pensés pour vous</em>', text: 'De la prévention aux traitements les plus avancés, nous réunissons au même endroit tout ce dont votre sourire a besoin.' },
+  en: { eyebrow: 'Our treatments', title: 'Complete care,<br /> <em>designed around you</em>', text: 'From prevention to the most advanced treatments, everything your smile needs under one roof.' },
+}[lang];
+---
+
+<section class="section bg-sand">
+  <div class="container-site">
+    {
+      heading && (
+        <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <SectionHeading eyebrow={copy.eyebrow} title={copy.title} text={copy.text} />
+          <a href={path('treatments', lang)} class="link-arrow shrink-0" data-reveal>
+            {t('nav.allTreatments')}
+            <Icon name="arrowRight" />
+          </a>
+        </div>
+      )
+    }
+
+    <!-- Swipeable on phones, 2×2 grid on laptops, 4 columns from xl -->
+    <div class="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 no-scrollbar md:-mx-8 md:scroll-px-8 md:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 xl:grid-cols-4" data-reveal-group>
+      {
+        categories.map((cat) => {
+          const items = treatmentsByCategory(cat.id);
+          return (
+            <article id={cat.id} class="group relative flex w-[84%] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-ink text-white sm:w-[60%] lg:w-auto" data-reveal>
+              <div class="relative aspect-[4/3] overflow-hidden lg:aspect-[16/9] xl:aspect-[4/3.4]">
+                <Image
+                  src={cat.image}
+                  alt=""
+                  widths={[400, 640, 800]}
+                  sizes="(min-width: 1280px) 24vw, (min-width: 1024px) 45vw, 84vw"
+                  class="size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+                />
+                <span class="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+              </div>
+              <div class="relative -mt-16 flex flex-1 flex-col p-6 sm:p-7">
+                <h3 class="h-card text-white">{cat[lang].title}</h3>
+                <p class="mt-3 text-[0.95rem] text-white/70">{cat[lang].text}</p>
+                <ul class="mt-6 flex-1 divide-y divide-white/10 border-t border-white/10">
+                  {items.map((tr) => (
+                    <li>
+                      <a href={treatmentPath(tr[lang].slug, lang)} class="group/item flex min-h-12 items-center justify-between gap-3 text-[0.95rem] text-white/85 transition-colors hover:text-accent">
+                        {tr[lang].title}
+                        <Icon name="arrowUpRight" class="size-4 shrink-0 transition-transform group-hover/item:translate-x-0.5 group-hover/item:-translate-y-0.5" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>

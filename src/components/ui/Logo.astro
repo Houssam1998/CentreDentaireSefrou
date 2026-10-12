@@ -1,0 +1,48 @@
+---
+/**
+ * Brand lockup: the line-art tooth mark + wordmark.
+ * `auto` follows the header state (white over the hero, ink once the header turns solid).
+ */
+interface Props {
+  variant?: 'auto' | 'light' | 'dark';
+  class?: string;
+}
+const { variant = 'auto', class: className } = Astro.props;
+---
+
+<span class:list={['flex items-center gap-3', className]}>
+  <span class="relative block size-10 shrink-0 sm:size-11 lg:size-12">
+    {
+      variant !== 'dark' && (
+        <img
+          src="/brand/mark-white.png"
+          alt=""
+          width="243"
+          height="262"
+          class:list={[
+            'absolute inset-0 size-full object-contain transition-opacity duration-500',
+            variant === 'auto' && 'group-[.is-solid]/header:opacity-0',
+          ]}
+        />
+      )
+    }
+    {
+      variant !== 'light' && (
+        <img
+          src="/brand/mark-ink.png"
+          alt=""
+          width="243"
+          height="262"
+          class:list={[
+            'absolute inset-0 size-full object-contain transition-opacity duration-500',
+            variant === 'auto' && 'opacity-0 group-[.is-solid]/header:opacity-100',
+          ]}
+        />
+      )
+    }
+  </span>
+  <span class="flex flex-col leading-none">
+    <span class="font-serif text-[1.12rem] font-semibold tracking-tight whitespace-nowrap sm:text-[1.3rem] lg:text-[1.45rem]">Centre Dentaire Sefrou</span>
+    <span class="mt-1 text-[0.62rem] font-medium tracking-[0.2em] uppercase opacity-75 sm:text-[0.68rem]">Dr Amine El Omari</span>
+  </span>
+</span>

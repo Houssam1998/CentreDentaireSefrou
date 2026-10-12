@@ -1,0 +1,117 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import ContactForm from '@/components/contact/ContactForm.astro';
+import { type Lang, useT } from '@/i18n';
+import { site, fullAddress, mapsEmbedUrl, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  selected?: string;
+  heading?: boolean;
+}
+const { lang, selected, heading = true } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: { eyebrow: 'Contact', title: 'Prenez <em>rendez-vous</em>', text: 'En ligne sur Dentisto, par téléphone, sur WhatsApp ou via le formulaire : choisissez ce qui vous convient.', online: 'Réservez en ligne', onlineText: 'Choisissez votre créneau directement dans l’agenda du Dr El Omari, 24 h/24.', onlineCta: 'Réserver sur Dentisto', address: 'Adresse', directions: 'Itinéraire', phone: 'Téléphone', hours: 'Horaires', map: 'Afficher la carte', mapNote: 'Charge Google Maps' },
+  en: { eyebrow: 'Contact', title: 'Book an <em>appointment</em>', text: 'Online on Dentisto, by phone, on WhatsApp or through the form: whatever suits you.', online: 'Book online', onlineText: 'Pick your slot directly in Dr El Omari’s calendar, 24/7.', onlineCta: 'Book on Dentisto', address: 'Address', directions: 'Directions', phone: 'Phone', hours: 'Opening hours', map: 'Show the map', mapNote: 'Loads Google Maps' },
+}[lang];
+---
+
+<section id="rdv" class="section bg-sand">
+  <div class="container-site">
+    {!heading && <h2 class="sr-only" set:html={copy.title} />}
+    {
+      heading && (
+        <div data-reveal class="max-w-2xl">
+          <p class="eyebrow">{copy.eyebrow}</p>
+          <h2 class="h-section mt-4 [&_em]:text-primary [&_em]:italic" set:html={copy.title} />
+          <p class="lead mt-5">{copy.text}</p>
+        </div>
+      )
+    }
+
+    <div class:list={['grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8', heading && 'mt-12']}>
+      <div class="grid gap-4" data-reveal>
+        <!-- Online booking (Dentisto) -->
+        <a
+          href={site.bookingUrl}
+          target="_blank"
+          rel="noopener"
+          data-cta="contact-dentisto"
+          class="group flex flex-col items-start gap-5 rounded-3xl bg-primary p-6 text-white shadow-lift transition-colors hover:bg-primary-dark sm:p-7"
+        >
+          <span class="flex items-center gap-4">
+            <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+              <Icon name="calendar" class="size-6" />
+            </span>
+            <span>
+              <span class="block font-serif text-2xl leading-tight">{copy.online}</span>
+              <span class="mt-1 block text-sm text-white/75">{copy.onlineText}</span>
+            </span>
+          </span>
+          <span class="btn btn-light w-full group-hover:-translate-y-0.5 sm:w-auto">
+            {copy.onlineCta}
+            <Icon name="arrowUpRight" />
+          </span>
+        </a>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div class="card p-6">
+            <Icon name="mapPin" class="size-6 text-primary" />
+            <p class="mt-4 text-sm text-muted">{copy.address}</p>
+            <p class="mt-1 font-medium">{fullAddress}</p>
+            <a href={site.mapsUrl} target="_blank" rel="noopener" class="link-arrow mt-1 text-sm" data-cta="contact-directions">{copy.directions}<Icon name="arrowUpRight" /></a>
+          </div>
+          <div class="card p-6">
+            <Icon name="phone" class="size-6 text-primary" />
+            <p class="mt-4 text-sm text-muted">{copy.phone}</p>
+            <a href={site.phoneHref} class="flex min-h-11 items-center font-medium hover:text-primary" data-cta="contact-call">{site.phone}</a>
+            <a href={whatsappLink(t('whatsapp.greeting'))} target="_blank" rel="noopener" class="flex min-h-11 items-center gap-2 font-medium hover:text-primary" data-cta="contact-whatsapp">
+              <Icon name="whatsapp" class="size-4 text-whatsapp" />{site.whatsappDisplay}
+            </a>
+          </div>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-center gap-3">
+            <Icon name="clock" class="size-6 text-primary" />
+            <p class="font-medium">{copy.hours}</p>
+          </div>
+          <dl class="mt-4 divide-y divide-line">
+            {
+              site.hours.map((h) => (
+                <div class="flex justify-between gap-4 py-2.5 text-[0.95rem]">
+                  <dt class="text-muted">{h.days[lang]}</dt>
+                  <dd class:list={['grid text-right font-medium sm:flex sm:gap-2', !h.time && 'text-muted']}>
+                    {h.time ? h.time.map((range) => <span class="whitespace-nowrap">{range}</span>) : t('footer.closed')}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+
+        <!-- Map facade: Google Maps only loads on demand -->
+        <div data-map={mapsEmbedUrl} data-map-title={`${site.name} — Google Maps`} class="relative min-h-72 flex-1 overflow-hidden rounded-3xl border border-line bg-[radial-gradient(circle_at_30%_40%,#e2efee,transparent_60%),linear-gradient(135deg,#efe9df,#e4dccd)]">
+          <svg class="absolute inset-0 size-full text-ink/[0.07]" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
+            <path d="M-20 220 C 80 180, 140 260, 240 200 S 380 120, 440 160" stroke="currentColor" stroke-width="14" />
+            <path d="M120 -20 C 140 80, 100 160, 160 320" stroke="currentColor" stroke-width="10" />
+            <path d="M260 -20 C 250 100, 300 180, 280 320" stroke="currentColor" stroke-width="6" />
+            <path d="M-20 90 C 100 110, 200 60, 420 100" stroke="currentColor" stroke-width="5" />
+          </svg>
+          <button type="button" data-map-load class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-ink">
+            <span class="relative inline-flex size-16 items-center justify-center rounded-full bg-primary text-white shadow-lift">
+              <span class="absolute inset-0 animate-ping rounded-full bg-primary opacity-25 [animation-duration:2.4s]"></span>
+              <Icon name="mapPin" class="relative size-7" />
+            </span>
+            <span class="font-medium">{copy.map}</span>
+            <span class="text-xs text-muted">{copy.mapNote}</span>
+          </button>
+        </div>
+      </div>
+
+      <div data-reveal>
+        <ContactForm lang={lang} selected={selected} />
+      </div>
+    </div>
+  </div>
+</section>

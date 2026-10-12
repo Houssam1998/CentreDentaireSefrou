@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { path } from '@/i18n';
+
+const lang = Astro.url.pathname.startsWith('/en') ? 'en' : 'fr';
+const copy = {
+  fr: { title: 'Page introuvable | Centre Dentaire Sefrou', h: 'Cette page s’est <em>égarée</em>.', p: 'La page que vous cherchez n’existe pas ou a été déplacée.', home: 'Retour à l’accueil', treatments: 'Voir nos soins' },
+  en: { title: 'Page not found | Centre Dentaire Sefrou', h: 'This page has <em>wandered off</em>.', p: 'The page you are looking for doesn’t exist or has moved.', home: 'Back to home', treatments: 'See our treatments' },
+}[lang];
+---
+
+<BaseLayout lang={lang} title={copy.title} description={copy.p} alternate={path('home', lang === 'fr' ? 'en' : 'fr')} noindex>
+  <section class="relative flex min-h-[100svh] items-center overflow-hidden bg-ink text-white">
+    <img src="/brand/mark-white.png" alt="" width="243" height="258" class="pointer-events-none absolute -right-20 bottom-0 w-[28rem] opacity-[0.06]" />
+    <div class="container-site relative py-32">
+      <p class="font-serif text-[7rem] leading-none text-accent sm:text-[10rem]">404</p>
+      <h1 class="h-section mt-4 max-w-xl [&_em]:text-accent [&_em]:italic" set:html={copy.h} />
+      <p class="mt-5 max-w-md text-white/70">{copy.p}</p>
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <a href={path('home', lang)} class="btn btn-light"><Icon name="arrowLeft" />{copy.home}</a>
+        <a href={path('treatments', lang)} class="btn btn-outline-light">{copy.treatments}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

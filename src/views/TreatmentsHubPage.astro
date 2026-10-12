@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import TreatmentCard from '@/components/ui/TreatmentCard.astro';
+import CtaStrip from '@/components/ui/CtaStrip.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { categories, treatmentsByCategory } from '@/data/treatments';
+import { breadcrumbSchema } from '@/lib/schema';
+import heroImage from '@/assets/media/clinic/treatment-room-1.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: {
+    seoTitle: 'Nos soins dentaires à Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Implants, chirurgie, facettes, aligneurs, blanchiment, smile design, prothèses, gencives, ronflement, apnée du sommeil et bruxisme : découvrez tous les soins du Centre Dentaire Sefrou.',
+    eyebrow: 'Nos soins',
+    title: 'Des soins complets, <em>sous un même toit</em>',
+    text: 'Prévention, esthétique ou chirurgie : chaque traitement est expliqué, planifié et réalisé avec précision.',
+    strip: 'Vous hésitez entre plusieurs traitements ? Nous vous conseillons.',
+  },
+  en: {
+    seoTitle: 'Our dental treatments in Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Implants, surgery, veneers, clear aligners, whitening, smile design, prosthetics, gum care, snoring, sleep apnea and bruxism: discover every treatment at Centre Dentaire Sefrou.',
+    eyebrow: 'Treatments',
+    title: 'Complete care, <em>under one roof</em>',
+    text: 'Prevention, aesthetics or surgery: every treatment is explained, planned and performed with precision.',
+    strip: 'Unsure which treatment is right for you? We’ll advise you.',
+  },
+}[lang];
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: t('nav.treatments'), href: path('treatments', lang) },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={copy.seoTitle}
+  description={copy.seoDesc}
+  alternate={routes.treatments[lang === 'fr' ? 'en' : 'fr']}
+  schema={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero eyebrow={copy.eyebrow} title={copy.title} text={copy.text} image={heroImage} crumbs={crumbs} />
+
+  {
+    categories.map((cat, i) => (
+      <section id={cat.id} class:list={['section scroll-mt-20', i % 2 === 1 && 'bg-sand']}>
+        <div class="container-site">
+          <div class="grid gap-6 md:grid-cols-[auto_1fr] md:items-end md:gap-16" data-reveal>
+            <h2 class="h-section">
+              <span class="mr-3 align-top font-sans text-sm font-semibold tracking-[0.2em] text-accent-dark">{String(i + 1).padStart(2, '0')}</span>
+              {cat[lang].title}
+            </h2>
+            <p class="lead max-w-xl">{cat[lang].text}</p>
+          </div>
+          <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {treatmentsByCategory(cat.id).map((tr) => <TreatmentCard lang={lang} treatment={tr} />)}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <CtaStrip lang={lang} text={copy.strip} />
+  <ContactSection lang={lang} />
+</BaseLayout>

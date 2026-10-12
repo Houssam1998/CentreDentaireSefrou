@@ -1,0 +1,38 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import { type Lang, useT } from '@/i18n';
+import { site, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  items: { q: string; a: string }[];
+}
+const { lang, items } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: { eyebrow: 'Questions fréquentes', title: 'Vous vous posez <em>des questions</em> ?', card: 'Vous ne trouvez pas votre réponse ?', cardText: 'Notre équipe vous répond rapidement, par téléphone ou sur WhatsApp.' },
+  en: { eyebrow: 'FAQ', title: 'Have <em>questions</em>?', card: 'Can’t find your answer?', cardText: 'Our team replies quickly by phone or on WhatsApp.' },
+}[lang];
+---
+
+<section class="section">
+  <div class="container-site grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <div data-reveal>
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h2 class="h-section mt-4 [&_em]:text-primary [&_em]:italic" set:html={copy.title} />
+      </div>
+      <div class="mt-10 rounded-3xl bg-primary p-7 text-white sm:p-8" data-reveal>
+        <p class="font-serif text-2xl">{copy.card}</p>
+        <p class="mt-2 text-white/75">{copy.cardText}</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href={site.phoneHref} class="btn btn-light" data-cta="faq-call"><Icon name="phone" />{t('cta.call')}</a>
+          <a href={whatsappLink(t('whatsapp.greeting'))} target="_blank" rel="noopener" class="btn btn-whatsapp" data-cta="faq-whatsapp"><Icon name="whatsapp" />WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <FaqList items={items} />
+  </div>
+</section>

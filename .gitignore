@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+.DS_Store
+Thumbs.db
+
+# Raw source material — not needed for the build (processed copies live in src/assets).
+# Kept out of the public repository: contains personal data (CV) and original patient photos.
+assets/
+before_after/

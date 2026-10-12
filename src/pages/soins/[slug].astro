@@ -1,0 +1,12 @@
+---
+import TreatmentPage from '@/views/TreatmentPage.astro';
+import { treatments, type Treatment } from '@/data/treatments';
+
+export function getStaticPaths() {
+  return treatments.map((treatment) => ({ params: { slug: treatment.fr.slug }, props: { treatment } }));
+}
+
+const { treatment } = Astro.props as { treatment: Treatment };
+---
+
+<TreatmentPage lang="fr" treatment={treatment} />

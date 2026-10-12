@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { type Lang, path } from '@/i18n';
+import room1 from '@/assets/media/clinic/treatment-room-1.jpg';
+import reception from '@/assets/media/clinic/reception.jpg';
+import waiting from '@/assets/media/clinic/waiting-room.jpg';
+import xray from '@/assets/media/clinic/xray-unit.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  fr: {
+    eyebrow: 'Le Centre',
+    title: 'Un cadre <em>moderne</em> et apaisant',
+    text: 'Un espace lumineux, des équipements récents et une hygiène irréprochable, pensés pour votre confort.',
+    link: 'Visiter le centre',
+    alts: ['Salle de soins avec scanner intra-oral', 'Accueil du Centre Dentaire Sefrou', "Salle d'attente", 'Radiographie panoramique 3D (CBCT)'],
+  },
+  en: {
+    eyebrow: 'The Centre',
+    title: 'A <em>modern</em>, calming space',
+    text: 'A bright space, recent equipment and impeccable hygiene, all designed for your comfort.',
+    link: 'Visit the centre',
+    alts: ['Treatment room with intraoral scanner', 'Centre Dentaire Sefrou reception', 'Waiting room', '3D panoramic X-ray (CBCT)'],
+  },
+}[lang];
+
+// Real clinic photos (first one fills the large tile)
+const images = [
+  { src: room1, position: '50% 60%' },
+  { src: reception, position: '50% 78%' },
+  { src: waiting, position: '50% 65%' },
+  { src: xray, position: '50% 35%' },
+];
+---
+
+<section class="section bg-ink text-white">
+  <div class="container-site">
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeading eyebrow={copy.eyebrow} title={copy.title} text={copy.text} tone="light" />
+      <a href={path('centre', lang)} class="link-arrow shrink-0 !text-accent" data-reveal>{copy.link}<Icon name="arrowRight" /></a>
+    </div>
+
+    <!-- Swipe strip on phones, bento grid from md -->
+    <div class="-mx-5 mt-12 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 no-scrollbar md:mx-0 md:grid md:auto-rows-[15rem] md:grid-cols-4 md:gap-4 md:overflow-visible md:px-0 lg:auto-rows-[17rem]">
+      {
+        images.map((img, i) => (
+          <div class:list={['group relative h-[26rem] w-[74%] shrink-0 snap-start overflow-hidden rounded-3xl md:h-auto md:w-auto', i === 0 && 'md:col-span-2 md:row-span-2', i === 1 && 'md:col-span-2']} data-reveal>
+            <Image
+              src={img.src}
+              alt={copy.alts[i]}
+              widths={[400, 700, 1000]}
+              sizes={i < 2 ? '(min-width: 768px) 50vw, 74vw' : '(min-width: 768px) 25vw, 74vw'}
+              class="absolute inset-0 size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+              style={`object-position:${img.position}`}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

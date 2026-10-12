@@ -1,0 +1,38 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import type { Lang } from '@/i18n';
+import { process } from '@/data/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  fr: { eyebrow: 'Votre parcours', title: 'Un accompagnement <em>clair</em>, à chaque étape' },
+  en: { eyebrow: 'Your journey', title: '<em>Clear</em> guidance at every step' },
+}[lang];
+---
+
+<section class="section bg-sand">
+  <div class="container-site">
+    <SectionHeading eyebrow={copy.eyebrow} title={copy.title} align="center" class="max-w-3xl" />
+    <ol class="relative mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      <!-- connecting line (desktop) -->
+      <span class="absolute top-7 right-[12.5%] left-[12.5%] hidden h-px bg-accent/50 lg:block" aria-hidden="true"></span>
+      {
+        process[lang].map((step, i) => (
+          <li class="relative flex gap-5 lg:flex-col lg:items-center lg:text-center" data-reveal>
+            <span class="relative z-10 inline-flex size-14 shrink-0 items-center justify-center rounded-full border border-accent bg-ivory font-serif text-2xl text-accent-dark">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h3 class="font-serif text-2xl">{step.title}</h3>
+              <p class="mt-2 text-muted">{step.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,178 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import CtaStrip from '@/components/ui/CtaStrip.astro';
+import Stats from '@/components/home/Stats.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { site } from '@/data/site';
+import { breadcrumbSchema } from '@/lib/schema';
+import heroImage from '@/assets/media/clinic/treatment-room-1.jpg';
+import portrait from '@/assets/media/clinic/doctor-seated.jpg';
+import working from '@/assets/media/clinic/treatment-room-2.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+// Source : CV du Dr Mohamed Amine El Omari (informations personnelles volontairement non publiées)
+const copy = {
+  fr: {
+    seoTitle: 'Dr Amine El Omari — Chirurgien-dentiste à Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Parcours, formations et engagements du Dr Mohamed Amine El Omari, chirurgien-dentiste et fondateur du Centre Dentaire Sefrou (ouvert le 22 juin 2026).',
+    eyebrow: 'Le Docteur',
+    role: 'Chirurgien-dentiste',
+    alt: 'Le Dr Amine El Omari dans une salle de soins du Centre Dentaire Sefrou',
+    text: 'Une pratique fondée sur l’écoute, la précision et le respect de chaque patient.',
+    bioTitle: 'Une approche <em>humaine</em> de la dentisterie',
+    bio: [
+      'Diplômé en 2020 de l’Université d’État de Médecine de Volgograd, le Dr Mohamed Amine El Omari a exercé pendant plus de cinq ans comme chirurgien-dentiste dans des cabinets de Fès, Rabat et Sefrou : diagnostics et plans de traitement, soins conservateurs et endodontie, parodontologie, chirurgie orale, implants et prothèses.',
+      'En juin 2026, il ouvre le Centre Dentaire Sefrou pour offrir aux habitants de Sefrou et de sa région des soins de haut niveau, au plus près de chez eux, avec des outils numériques : radiographie panoramique 3D (CBCT), empreintes optiques et conception 3D du sourire.',
+      'Sa pratique repose sur un principe simple : prendre le temps. Le temps d’écouter, d’expliquer chaque option et de laisser au patient le choix éclairé de son traitement.',
+    ],
+    timelineTitle: 'Parcours',
+    timeline: [
+      { year: '2020', title: 'Diplôme de médecin-dentiste', text: 'Université d’État de Médecine de Volgograd (Russie).' },
+      { year: '2021', title: 'Formations approfondies', text: 'Prothèse, endodontie et composite esthétique (Innovmat, Rabat) · Chirurgie buccale (SFCO, Rabat).' },
+      { year: '2022', title: 'Formation en parodontologie', text: 'Innovmat, Rabat.' },
+      { year: '2020 – 2026', title: 'Chirurgien-dentiste à Fès, Rabat et Sefrou', text: 'Plus de cinq ans d’exercice en cabinet, de la prévention à l’implantologie.' },
+      { year: '22 juin 2026', title: 'Ouverture du Centre Dentaire Sefrou', text: 'Un cabinet moderne et numérique au service de toute la famille.' },
+    ],
+    languagesTitle: 'Langues de consultation',
+    languages: 'Arabe · Français · Anglais',
+    valuesTitle: 'Nos <em>engagements</em>',
+    values: [
+      { icon: 'heart', title: 'Écoute & bienveillance', text: 'Chaque patient est unique. Vos questions et vos appréhensions sont toujours prises en compte.' },
+      { icon: 'checkCircle', title: 'Transparence', text: 'Diagnostic expliqué, options présentées clairement et devis détaillé avant tout soin.' },
+      { icon: 'sparkles', title: 'Exigence', text: 'Formation continue, protocoles rigoureux et matériaux de qualité pour des résultats durables.' },
+    ],
+  },
+  en: {
+    seoTitle: 'Dr Amine El Omari — Dental surgeon in Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Background, training and commitments of Dr Mohamed Amine El Omari, dental surgeon and founder of Centre Dentaire Sefrou (opened 22 June 2026).',
+    eyebrow: 'The Doctor',
+    role: 'Dental surgeon',
+    alt: 'Dr Amine El Omari in a treatment room at Centre Dentaire Sefrou',
+    text: 'A practice built on listening, precision and respect for every patient.',
+    bioTitle: 'A <em>human</em> approach to dentistry',
+    bio: [
+      'A 2020 graduate of Volgograd State Medical University, Dr Mohamed Amine El Omari practised as a dental surgeon for more than five years in clinics in Fès, Rabat and Sefrou: diagnosis and treatment planning, restorative care and endodontics, periodontics, oral surgery, implants and prosthetics.',
+      'In June 2026 he opened Centre Dentaire Sefrou to offer the people of Sefrou and the surrounding region high-quality care close to home, with digital tools: 3D panoramic CBCT imaging, optical impressions and 3D smile design.',
+      'His practice rests on a simple principle: taking time. Time to listen, to explain every option and to let each patient make an informed choice.',
+    ],
+    timelineTitle: 'Background',
+    timeline: [
+      { year: '2020', title: 'Dental surgeon degree', text: 'Volgograd State Medical University (Russia).' },
+      { year: '2021', title: 'In-depth training', text: 'Prosthetics, endodontics and aesthetic composites (Innovmat, Rabat) · Oral surgery (SFCO, Rabat).' },
+      { year: '2022', title: 'Periodontics training', text: 'Innovmat, Rabat.' },
+      { year: '2020 – 2026', title: 'Dental surgeon in Fès, Rabat and Sefrou', text: 'More than five years of clinical practice, from prevention to implantology.' },
+      { year: '22 June 2026', title: 'Opening of Centre Dentaire Sefrou', text: 'A modern, digital clinic serving the whole family.' },
+    ],
+    languagesTitle: 'Consultation languages',
+    languages: 'Arabic · French · English',
+    valuesTitle: 'Our <em>commitments</em>',
+    values: [
+      { icon: 'heart', title: 'Listening & kindness', text: 'Every patient is unique. Your questions and concerns are always taken into account.' },
+      { icon: 'checkCircle', title: 'Transparency', text: 'Diagnosis explained, options clearly presented and a detailed quote before any treatment.' },
+      { icon: 'sparkles', title: 'High standards', text: 'Continuing education, rigorous protocols and quality materials for lasting results.' },
+    ],
+  },
+}[lang] as {
+  seoTitle: string; seoDesc: string; eyebrow: string; role: string; alt: string; text: string; bioTitle: string; bio: string[];
+  timelineTitle: string; timeline: { year: string; title: string; text: string }[];
+  languagesTitle: string; languages: string;
+  valuesTitle: string; values: { icon: 'heart' | 'checkCircle' | 'sparkles'; title: string; text: string }[];
+};
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: site.doctor, href: path('doctor', lang) },
+];
+const portraitJpg = await getImage({ src: portrait, width: 800, format: 'jpg' });
+const physician = {
+  '@context': 'https://schema.org',
+  '@type': 'Physician',
+  name: site.doctorFull,
+  image: new URL(portraitJpg.src, Astro.site).href,
+  alternateName: site.doctor,
+  medicalSpecialty: 'Dentistry',
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Volgograd State Medical University' },
+  knowsLanguage: ['ar', 'fr', 'en'],
+  worksFor: { '@id': new URL('/#dentist', Astro.site).href },
+};
+---
+
+<BaseLayout lang={lang} title={copy.seoTitle} description={copy.seoDesc} alternate={routes.doctor[lang === 'fr' ? 'en' : 'fr']} ogImage={portrait} schema={[physician, breadcrumbSchema(crumbs, Astro.site)]}>
+  <PageHero eyebrow={copy.eyebrow} title={site.doctor} text={copy.text} image={heroImage} crumbs={crumbs} />
+
+  <section class="section overflow-x-clip">
+    <div class="container-site grid items-start gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+      <div class="relative mx-auto w-full max-w-md lg:sticky lg:top-28 lg:max-w-none" data-reveal>
+        <div class="absolute -inset-3 translate-x-5 translate-y-5 rounded-[2rem] border border-accent sm:-inset-4" aria-hidden="true"></div>
+        <Image src={portrait} alt={copy.alt} widths={[420, 640, 900]} sizes="(min-width: 1024px) 38vw, 90vw" class="relative aspect-[4/5] w-full rounded-[2rem] object-cover object-[59%_50%]" />
+      </div>
+      <div>
+        <p class="eyebrow" data-reveal>{copy.role}</p>
+        <h2 class="h-section mt-4 [&_em]:text-primary [&_em]:italic" data-reveal set:html={copy.bioTitle} />
+        <div class="lead mt-7 space-y-5" data-reveal>{copy.bio.map((p) => <p>{p}</p>)}</div>
+
+        <h3 class="mt-14 font-serif text-3xl" data-reveal>{copy.timelineTitle}</h3>
+        <ol class="mt-6 border-l border-accent/50">
+          {
+            copy.timeline.map((item) => (
+              <li class="relative pb-8 pl-8 last:pb-0" data-reveal>
+                <span class="absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-accent" />
+                <p class="text-sm font-semibold tracking-[0.15em] text-accent-dark">{item.year}</p>
+                <p class="mt-1 font-serif text-2xl">{item.title}</p>
+                <p class="mt-1 text-muted">{item.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="mt-10 flex items-center gap-4 rounded-2xl bg-sand px-6 py-5" data-reveal>
+          <Icon name="globe" class="size-6 shrink-0 text-primary" />
+          <div>
+            <p class="text-sm text-muted">{copy.languagesTitle}</p>
+            <p class="font-medium">{copy.languages}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Stats lang={lang} />
+
+  <section class="section">
+    <div class="container-site grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <h2 class="h-section [&_em]:text-primary [&_em]:italic" data-reveal set:html={copy.valuesTitle} />
+        <div class="mt-10 space-y-4">
+          {
+            copy.values.map((v) => (
+              <div class="card flex gap-5 p-6" data-reveal>
+                <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                  <Icon name={v.icon} class="size-6" />
+                </span>
+                <div>
+                  <h3 class="font-serif text-2xl">{v.title}</h3>
+                  <p class="mt-1 text-muted">{v.text}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div class="overflow-hidden rounded-[2rem]" data-reveal>
+        <Image src={working} alt="" widths={[480, 800, 1100]} sizes="(min-width: 1024px) 45vw, 92vw" class="aspect-[4/5] w-full object-cover" data-img-reveal />
+      </div>
+    </div>
+  </section>
+
+  <CtaStrip lang={lang} text={lang === 'fr' ? 'Rencontrons-nous lors d’une première consultation.' : 'Let’s meet at a first consultation.'} tone="sand" />
+  <ContactSection lang={lang} />
+</BaseLayout>

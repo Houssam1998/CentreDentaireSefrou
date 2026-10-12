@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import BeforeAfterSlider from '@/components/ui/BeforeAfterSlider.astro';
+import CaseStudy from '@/components/home/CaseStudy.astro';
+import CtaStrip from '@/components/ui/CtaStrip.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { cases } from '@/data/content';
+import { breadcrumbSchema } from '@/lib/schema';
+import heroImage from '@/assets/media/clinic/treatment-room-1.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: {
+    seoTitle: 'Avant / Après — résultats | Centre Dentaire Sefrou',
+    seoDesc: 'Découvrez des exemples de transformations du sourire : facettes, blanchiment, détartrage. Centre Dentaire Sefrou.',
+    eyebrow: 'Avant / Après',
+    title: 'Des sourires <em>transformés</em>',
+    text: 'Faites glisser le curseur pour comparer avant et après traitement.',
+    illustrations: 'Illustrations',
+    illustrationsText: 'Exemples illustratifs pour d’autres soins (images non issues du cabinet). De nouveaux cas réels du cabinet seront ajoutés au fil du temps.',
+    strip: 'Et si le prochain sourire transformé était le vôtre ?',
+  },
+  en: {
+    seoTitle: 'Before / After — results | Centre Dentaire Sefrou',
+    seoDesc: 'Discover examples of smile transformations: veneers, whitening, scaling. Centre Dentaire Sefrou.',
+    eyebrow: 'Before / After',
+    title: 'Smiles, <em>transformed</em>',
+    text: 'Drag the slider to compare before and after treatment.',
+    illustrations: 'Illustrations',
+    illustrationsText: 'Illustrative examples for other treatments (images not from the clinic). More real cases from the clinic will be added over time.',
+    strip: 'What if the next transformed smile were yours?',
+  },
+}[lang];
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: t('nav.beforeAfter'), href: path('beforeAfter', lang) },
+];
+---
+
+<BaseLayout lang={lang} title={copy.seoTitle} description={copy.seoDesc} alternate={routes.beforeAfter[lang === 'fr' ? 'en' : 'fr']} schema={[breadcrumbSchema(crumbs, Astro.site)]}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.title} text={copy.text} image={heroImage} crumbs={crumbs} imagePosition="center 60%" />
+
+  {cases.filter((c) => c.real).map((c) => <CaseStudy lang={lang} item={c} tone="light" />)}
+
+  <section class="section">
+    <div class="container-site">
+      <div class="max-w-2xl" data-reveal>
+        <h2 class="h-section">{copy.illustrations}</h2>
+        <p class="lead mt-4">{copy.illustrationsText}</p>
+      </div>
+      <div class="mt-12 grid gap-12 md:grid-cols-2 md:gap-8 lg:gap-12">
+        {cases.filter((c) => !c.real).map((c) => <BeforeAfterSlider lang={lang} item={c} />)}
+      </div>
+    </div>
+  </section>
+
+  <CtaStrip lang={lang} text={copy.strip} tone="sand" />
+  <ContactSection lang={lang} />
+</BaseLayout>

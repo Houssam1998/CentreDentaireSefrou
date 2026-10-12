@@ -1,0 +1,119 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import room1 from '@/assets/media/clinic/treatment-room-1.jpg';
+import logoWall from '@/assets/media/clinic/logo-wall.jpg';
+import waiting from '@/assets/media/clinic/waiting-room.jpg';
+import doctorStanding from '@/assets/media/clinic/doctor-standing.jpg';
+import doctorSeated from '@/assets/media/clinic/doctor-seated.jpg';
+import { type Lang, useT } from '@/i18n';
+import { site, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+/**
+ * Real clinic photos for the crossfade hero (site.heroMode === 'photos').
+ * A slide may carry a different photo for wide screens (`desktop`): the portrait shot of the
+ * doctor suits phones, the landscape one suits desktops. Only the visible image is downloaded.
+ */
+type Slide = { src: ImageMetadata; position: string; desktop?: { src: ImageMetadata; position: string } };
+const slides: Slide[] = [
+  { src: room1, position: '50% 55%' },
+  { src: doctorStanding, position: '50% 30%', desktop: { src: doctorSeated, position: '62% 35%' } },
+  { src: logoWall, position: '50% 40%' },
+  { src: waiting, position: '50% 60%' },
+];
+
+const copy = {
+  fr: {
+    eyebrow: 'Cabinet dentaire à Sefrou',
+    title: 'Votre sourire,<br /> entre des mains <em>expertes</em>.',
+    text: `${site.doctor} et son équipe vous accueillent dans un cadre moderne et apaisant pour des soins précis, confortables et durables.`,
+    experience: "ans d'expérience",
+  },
+  en: {
+    eyebrow: 'Dental clinic in Sefrou',
+    title: 'Your smile,<br /> in <em>expert</em> hands.',
+    text: `${site.doctor} and the team welcome you to a modern, calming clinic for precise, comfortable and long-lasting dental care.`,
+    experience: 'years of experience',
+  },
+}[lang];
+---
+
+<section class="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-ink text-white" aria-label={copy.eyebrow}>
+  {
+    site.heroMode === 'video' ? (
+      /* Background video (src attached by JS unless the visitor saves data / prefers reduced motion) */
+      <div class="absolute inset-0 -z-10" data-parallax>
+        <video data-hero-video data-src="/media/hero.mp4" class="size-full scale-105 object-cover" poster="/media/hero-poster.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      </div>
+    ) : (
+      /* Real clinic photos: CSS crossfade + slow zoom (see .hero-slide in global.css) */
+      <div class="absolute inset-0 -z-10 overflow-hidden" data-parallax aria-hidden="true">
+        {slides.map((slide, i) => (
+          <div class="hero-slide absolute inset-0" style={`--i:${i}`}>
+            <Image
+              src={slide.src}
+              alt=""
+              widths={[640, 960, 1440, 1920]}
+              sizes="100vw"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : 'low'}
+              class:list={['size-full object-cover', slide.desktop && 'md:hidden']}
+              style={`object-position:${slide.position}`}
+            />
+            {slide.desktop && (
+              <Image
+                src={slide.desktop.src}
+                alt=""
+                widths={[960, 1440, 1920]}
+                sizes="100vw"
+                loading="lazy"
+                fetchpriority="low"
+                class="hidden size-full object-cover md:block"
+                style={`object-position:${slide.desktop.position}`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+  <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/55 to-ink/30"></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink/70 via-ink/20 to-transparent"></div>
+
+  <div class="container-site pt-32 pb-24 md:pb-28 lg:pb-32">
+    <div class="max-w-3xl">
+      <p class="eyebrow eyebrow-light" data-hero-line>{copy.eyebrow}</p>
+      <h1 class="h-display mt-5 [&_em]:text-accent [&_em]:italic" data-hero-line set:html={copy.title} />
+      <p class="mt-6 max-w-xl text-[1.05rem] text-white/80 sm:text-lg" data-hero-line>{copy.text}</p>
+
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row" data-hero-line>
+        <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn btn-primary" data-cta="hero-book">
+          <Icon name="calendar" />{t('cta.book')}
+        </a>
+        <a href={whatsappLink(t('whatsapp.greeting'))} target="_blank" rel="noopener" class="btn btn-outline-light" data-cta="hero-whatsapp">
+          <Icon name="whatsapp" />{t('cta.whatsappChat')}
+        </a>
+      </div>
+
+      <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-white/80" data-hero-line>
+        <a href={site.googleReviewsUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/10 py-2 pr-4 pl-3 backdrop-blur-md transition-colors hover:bg-white/15">
+          <span class="flex text-accent">
+            {Array.from({ length: 5 }, () => <Icon name="star" class="size-4" />)}
+          </span>
+          <span><strong class="font-semibold text-white">{site.stats.rating.toLocaleString(lang, { minimumFractionDigits: 1 })}</strong> · {site.stats.reviews} {t('rating.google')}</span>
+        </a>
+        <span class="inline-flex items-center gap-2">
+          <span class="h-px w-6 bg-accent"></span>
+          <strong class="font-semibold text-white">{site.stats.years}+</strong>
+          {copy.experience}
+        </span>
+      </div>
+    </div>
+  </div>
+</section>

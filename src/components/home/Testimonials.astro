@@ -1,0 +1,71 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { type Lang, useT } from '@/i18n';
+import { site } from '@/data/site';
+import { testimonials } from '@/data/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: { eyebrow: 'Avis Google', title: 'Ce que disent <em>nos patients</em>', translated: '', all: 'Lire les avis sur Google', prev: 'Avis précédent', next: 'Avis suivant' },
+  en: { eyebrow: 'Google reviews', title: 'What <em>our patients</em> say', translated: ' · translated from French', all: 'Read the reviews on Google', prev: 'Previous review', next: 'Next review' },
+}[lang];
+---
+
+<section class="section overflow-hidden" data-carousel>
+  <div class="container-site">
+    <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+      <div data-reveal>
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h2 class="h-section mt-4 [&_em]:text-primary [&_em]:italic" set:html={copy.title} />
+      </div>
+      <div class="flex flex-wrap items-end justify-between gap-6" data-reveal>
+        <div class="flex items-center gap-5">
+          <p class="font-serif text-7xl leading-none">{site.stats.rating.toLocaleString(lang, { minimumFractionDigits: 1 })}</p>
+          <div>
+            <div class="flex text-accent">{Array.from({ length: 5 }, () => <Icon name="star" class="size-5" />)}</div>
+            <p class="mt-1.5 text-sm text-muted">{site.stats.reviews} {t('rating.google')}</p>
+          </div>
+        </div>
+        <div class="hidden gap-2 sm:flex">
+          <button type="button" data-carousel-prev class="inline-flex size-12 items-center justify-center rounded-full border border-ink/15 transition-colors hover:bg-ink hover:text-white disabled:pointer-events-none disabled:opacity-30" aria-label={copy.prev}>
+            <Icon name="arrowLeft" />
+          </button>
+          <button type="button" data-carousel-next class="inline-flex size-12 items-center justify-center rounded-full border border-ink/15 transition-colors hover:bg-ink hover:text-white disabled:pointer-events-none disabled:opacity-30" aria-label={copy.next}>
+            <Icon name="arrowRight" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ul data-carousel-track class="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-4 no-scrollbar md:-mx-8 md:scroll-px-8 md:px-8 lg:gap-6">
+      {
+        testimonials.map((r) => (
+          <li class="card flex w-[86%] shrink-0 snap-start flex-col p-7 sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-1rem)]">
+            <Icon name="quote" class="size-8 text-accent/60" />
+            <p class="mt-5 flex-1 text-[1.05rem] leading-relaxed">{r.text[lang]}</p>
+            <div class="mt-7 flex items-center gap-3 border-t border-line pt-5">
+              <span class="inline-flex size-11 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary">{r.name.charAt(0)}</span>
+              <div class="flex-1">
+                <p class="font-medium">{r.name}</p>
+                <p class="text-sm text-muted">{r.date[lang]}{copy.translated}</p>
+              </div>
+              <div class="flex text-accent" role="img" aria-label={`${r.rating}/5`}>
+                {Array.from({ length: r.rating }, () => <Icon name="star" class="size-3.5" />)}
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a href={site.googleReviewsUrl} target="_blank" rel="noopener" class="link-arrow mt-6" data-reveal>
+      {copy.all}
+      <Icon name="arrowUpRight" />
+    </a>
+  </div>
+</section>

@@ -1,0 +1,240 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { type Lang, path, treatmentPath, useT } from '@/i18n';
+import { categories, treatmentsByCategory } from '@/data/treatments';
+import { site, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  alternate: string;
+}
+
+const { lang, alternate } = Astro.props;
+const t = useT(lang);
+const current = Astro.url.pathname;
+const otherLang: Lang = lang === 'fr' ? 'en' : 'fr';
+
+const links = [
+  { label: t('nav.centre'), href: path('centre', lang) },
+  { label: t('nav.doctor'), href: path('doctor', lang) },
+  { label: t('nav.beforeAfter'), href: path('beforeAfter', lang) },
+  { label: t('nav.contact'), href: path('contact', lang) },
+];
+const isActive = (href: string) => current.replace(/\/?$/, '/').startsWith(href) && href.length > 4;
+const treatmentsActive = current.startsWith(path('treatments', lang));
+---
+
+<header
+  data-header
+  class="group/header fixed inset-x-0 top-0 z-50 text-white transition-[background-color,color,box-shadow,backdrop-filter] duration-500 [&.is-solid]:bg-ivory/90 [&.is-solid]:text-ink [&.is-solid]:shadow-[0_1px_0_var(--color-line)] [&.is-solid]:backdrop-blur-xl"
+>
+  <div class="container-site flex h-[4.5rem] items-center justify-between gap-4 lg:h-20">
+    <a href={path('home', lang)} class="relative z-10 shrink-0">
+      <Logo />
+      <span class="sr-only">— {t('nav.home')}</span>
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="Navigation principale">
+      <div data-mega class="group/mega">
+        <button
+          type="button"
+          class:list={[
+            'relative inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-[0.95rem] font-medium whitespace-nowrap transition-colors hover:bg-current/10 xl:px-4',
+            // invisible bridge so the panel stays open while the pointer moves down to it
+            "before:absolute before:inset-x-0 before:top-full before:h-7 before:content-['']",
+            treatmentsActive && 'after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:bg-accent',
+          ]}
+          aria-expanded="false"
+          aria-controls="mega-panel"
+          data-mega-toggle
+        >
+          {t('nav.treatments')}
+          <Icon name="chevronDown" class="size-4 transition-transform duration-300 group-data-open/mega:rotate-180" />
+        </button>
+
+        <div
+          id="mega-panel"
+          class="pointer-events-none invisible absolute inset-x-0 top-full translate-y-2 opacity-0 transition-all duration-300 ease-out group-data-open/mega:pointer-events-auto group-data-open/mega:visible group-data-open/mega:translate-y-0 group-data-open/mega:opacity-100"
+        >
+          <div class="container-site pt-2">
+            <div class="rounded-3xl border border-line bg-white p-8 text-ink shadow-lift">
+              <div class="grid grid-cols-4 gap-8">
+              {
+                categories.map((cat) => (
+                  <div>
+                    <p class="mb-4 text-xs font-semibold tracking-[0.18em] text-primary uppercase">{cat[lang].title}</p>
+                    <ul class="space-y-1">
+                      {treatmentsByCategory(cat.id).map((tr) => (
+                        <li>
+                          <a
+                            href={treatmentPath(tr[lang].slug, lang)}
+                            class="group/link -mx-3 flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors hover:bg-ivory"
+                          >
+                            <span>
+                              <span class="block font-medium">{tr[lang].title}</span>
+                              <span class="hidden text-sm text-muted 2xl:block">{tr[lang].tagline}</span>
+                            </span>
+                            <Icon
+                              name="arrowRight"
+                              class="size-4 shrink-0 -translate-x-1 text-primary opacity-0 transition-all group-hover/link:translate-x-0 group-hover/link:opacity-100"
+                            />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              }
+              </div>
+              <div class="mt-6 flex items-center justify-between gap-6 border-t border-line pt-6">
+                <a href={path('treatments', lang)} class="link-arrow">
+                  {t('nav.allTreatments')}
+                  <Icon name="arrowRight" />
+                </a>
+                <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn btn-primary !min-h-11" data-cta="mega-book">
+                  <Icon name="calendar" />{t('cta.book')}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.95rem] font-medium whitespace-nowrap transition-colors hover:bg-current/10 xl:px-4',
+              isActive(link.href) && 'after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:bg-accent',
+            ]}
+            aria-current={isActive(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <a
+        href={alternate}
+        hreflang={otherLang}
+        lang={otherLang}
+        class="hidden min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-semibold tracking-wide uppercase transition-colors hover:bg-current/10 sm:inline-flex"
+        aria-label={`${t('lang.label')} : ${t('lang.switch')}`}
+      >
+        <Icon name="globe" class="size-4" />
+        {otherLang}
+      </a>
+      <a
+        href={site.phoneHref}
+        data-cta="header-call"
+        class="hidden min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium whitespace-nowrap transition-colors hover:bg-current/10 2xl:inline-flex"
+      >
+        <Icon name="phone" class="size-4" />
+        {site.phone}
+      </a>
+      <a href={site.bookingUrl} target="_blank" rel="noopener" data-cta="header-book" class="btn btn-primary hidden !min-h-11 !px-5 md:inline-flex">
+        <Icon name="calendar" />
+        <span class="lg:hidden xl:inline">{t('cta.book')}</span>
+        <span class="hidden lg:inline xl:hidden">{t('cta.bookShort')}</span>
+      </a>
+
+      <button
+        type="button"
+        class="inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-current/10 lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-open
+      >
+        <Icon name="menu" class="size-6" />
+        <span class="sr-only">{t('nav.menu')}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile full-screen menu -->
+<div
+  id="mobile-menu"
+  data-mobile-menu
+  class="invisible fixed inset-0 z-[60] flex flex-col bg-ink text-white opacity-0 transition-[opacity,visibility] duration-300 data-open:visible data-open:opacity-100 lg:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label={t('nav.menu')}
+>
+  <div class="container-site flex h-[4.5rem] shrink-0 items-center justify-between">
+    <a href={path('home', lang)}><Logo variant="light" /></a>
+    <button type="button" class="inline-flex size-11 items-center justify-center rounded-full hover:bg-white/10" data-menu-close>
+      <Icon name="close" class="size-6" />
+      <span class="sr-only">{t('nav.close')}</span>
+    </button>
+  </div>
+
+  <nav class="container-site flex-1 overflow-y-auto overscroll-contain pt-4 pb-8" aria-label="Navigation mobile">
+    <ul class="divide-y divide-white/10 border-y border-white/10">
+      <li>
+        <a href={path('home', lang)} class="flex min-h-16 items-center font-serif text-[1.75rem]">{t('nav.home')}</a>
+      </li>
+      <li>
+        <details class="group">
+          <summary class="flex min-h-16 cursor-pointer items-center justify-between font-serif text-[1.75rem]">
+            {t('nav.treatments')}
+            <Icon name="plus" class="size-6 text-accent transition-transform duration-300 group-open:rotate-45" />
+          </summary>
+          <div class="space-y-5 pb-6">
+            {
+              categories.map((cat) => (
+                <div>
+                  <p class="mb-2 text-xs font-semibold tracking-[0.18em] text-accent uppercase">{cat[lang].title}</p>
+                  <ul>
+                    {treatmentsByCategory(cat.id).map((tr) => (
+                      <li>
+                        <a href={treatmentPath(tr[lang].slug, lang)} class="flex min-h-11 items-center text-white/85">
+                          {tr[lang].title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            }
+            <a href={path('treatments', lang)} class="link-arrow !text-accent">
+              {t('nav.allTreatments')}
+              <Icon name="arrowRight" />
+            </a>
+          </div>
+        </details>
+      </li>
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.href} class="flex min-h-16 items-center font-serif text-[1.75rem]">
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a href={alternate} hreflang={otherLang} lang={otherLang} class="mt-6 inline-flex min-h-11 items-center gap-2 text-white/80">
+      <Icon name="globe" class="size-5" />
+      {t('lang.switch')}
+    </a>
+
+    <div class="mt-6 grid gap-3">
+      <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn btn-light w-full" data-cta="menu-book">
+        <Icon name="calendar" />{t('cta.book')}
+      </a>
+      <div class="grid grid-cols-2 gap-3">
+        <a href={site.phoneHref} class="btn btn-outline-light" data-cta="menu-call"><Icon name="phone" />{t('cta.call')}</a>
+        <a href={whatsappLink(t('whatsapp.greeting'))} target="_blank" rel="noopener" class="btn btn-whatsapp" data-cta="menu-whatsapp">
+          <Icon name="whatsapp" />WhatsApp
+        </a>
+      </div>
+    </div>
+  </nav>
+</div>

@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import BeforeAfterSlider from '@/components/ui/BeforeAfterSlider.astro';
+import TreatmentCard from '@/components/ui/TreatmentCard.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import { type Lang, path, treatmentPath, useT } from '@/i18n';
+import { categories, treatments, type Treatment } from '@/data/treatments';
+import { caseFor } from '@/data/content';
+import CaseStudy from '@/components/home/CaseStudy.astro';
+import ScannerVideo from '@/components/ui/ScannerVideo.astro';
+import { site, whatsappLink } from '@/data/site';
+import { breadcrumbSchema, faqSchema } from '@/lib/schema';
+
+interface Props {
+  lang: Lang;
+  treatment: Treatment;
+}
+const { lang, treatment } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'fr' ? 'en' : 'fr';
+const c = treatment[lang];
+const category = categories.find((cat) => cat.id === treatment.category)!;
+const related = treatments.filter((tr) => tr.category === treatment.category && tr.id !== treatment.id);
+const relatedCase = caseFor(treatment.id);
+// A middle section (case study, illustration or scanner video) shifts the light/sand alternation
+const hasMiddle = Boolean(relatedCase || treatment.scanner);
+
+// Structured data describing the treatment itself (helps Google understand each page)
+const procedureSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalProcedure',
+  name: c.title,
+  description: c.seo.description,
+  url: new URL(treatmentPath(c.slug, lang), Astro.site).href,
+  howPerformed: c.steps.map((step) => `${step.title} : ${step.text}`).join(' '),
+  inLanguage: lang === 'fr' ? 'fr-MA' : 'en',
+};
+
+const copy = {
+  fr: { benefits: 'Les avantages', steps: 'Le déroulement', stepsEyebrow: 'Étape par étape', faq: 'Questions fréquentes', related: 'Soins associés', result: 'Exemple de résultat', whatsapp: `Bonjour, je souhaite des informations sur : ${c.title}.` },
+  en: { benefits: 'Benefits', steps: 'How it works', stepsEyebrow: 'Step by step', faq: 'Frequently asked questions', related: 'Related treatments', result: 'Example result', whatsapp: `Hello, I would like information about: ${c.title}.` },
+}[lang];
+
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: t('nav.treatments'), href: path('treatments', lang) },
+  { name: c.title, href: treatmentPath(c.slug, lang) },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={c.seo.title}
+  description={c.seo.description}
+  alternate={treatmentPath(treatment[other].slug, other)}
+  ogImage={treatment.image}
+  schema={[procedureSchema, faqSchema(c.faq), breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero title={c.title} eyebrow={category[lang].title} text={c.tagline} image={treatment.image} crumbs={crumbs}>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row" data-hero-line>
+      <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn btn-primary" data-cta="treatment-book"><Icon name="calendar" />{t('cta.book')}</a>
+      <a href={whatsappLink(copy.whatsapp)} target="_blank" rel="noopener" class="btn btn-outline-light" data-cta="treatment-whatsapp">
+        <Icon name="whatsapp" />{t('cta.whatsappChat')}
+      </a>
+    </div>
+  </PageHero>
+
+  <!-- Intro + benefits -->
+  <section class="section">
+    <div class="container-site grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
+      <div class="lead prose-site space-y-5 text-[1.1rem] !text-ink/80 md:text-[1.2rem]" data-reveal>
+        {c.intro.map((p, i) => <p class:list={[i === 0 && 'font-serif text-[1.6rem] leading-snug !text-ink md:text-[1.9rem]']}>{p}</p>)}
+      </div>
+      <aside class="rounded-3xl bg-ink p-7 text-white sm:p-9 lg:self-start" data-reveal>
+        <p class="eyebrow eyebrow-light">{copy.benefits}</p>
+        <ul class="mt-6 space-y-4">
+          {
+            c.benefits.map((b) => (
+              <li class="flex gap-3">
+                <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent">
+                  <Icon name="check" class="size-3.5" strokeWidth={2.4} />
+                </span>
+                {b}
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="section bg-sand">
+    <div class="container-site grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <div class="lg:sticky lg:top-28 lg:self-start" data-reveal>
+        <p class="eyebrow">{copy.stepsEyebrow}</p>
+        <h2 class="h-section mt-4">{copy.steps}</h2>
+        <div class="mt-8 hidden overflow-hidden rounded-3xl lg:block">
+          <Image src={treatment.image} alt="" widths={[480, 720]} sizes="35vw" class="aspect-[4/3] w-full object-cover" />
+        </div>
+      </div>
+      <ol class="relative space-y-4">
+        {
+          c.steps.map((s, i) => (
+            <li class="card flex gap-5 p-6 sm:gap-6 sm:p-8" data-reveal>
+              <span class="font-serif text-4xl leading-none text-accent sm:text-5xl">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <h3 class="font-serif text-2xl">{s.title}</h3>
+                <p class="mt-2 text-muted">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {
+    treatment.scanner && !relatedCase?.real && (
+      <section class="section">
+        <div class="container-site">
+          <ScannerVideo lang={lang} />
+        </div>
+      </section>
+    )
+  }
+  {relatedCase?.real && <CaseStudy lang={lang} item={relatedCase} />}
+  {
+    relatedCase && !relatedCase.real && (
+      <section class="section">
+        <div class="container-site grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div data-reveal>
+            <p class="eyebrow">{copy.result}</p>
+            <h2 class="h-section mt-4">{relatedCase.title[lang]}</h2>
+            <p class="lead mt-5">{relatedCase.text[lang]}</p>
+            <a href={path('beforeAfter', lang)} class="link-arrow mt-6">
+              {t('nav.beforeAfter')}
+              <Icon name="arrowRight" />
+            </a>
+          </div>
+          <BeforeAfterSlider lang={lang} item={relatedCase} caption={false} />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- FAQ -->
+  <section class:list={['section', hasMiddle && 'bg-sand']}>
+    <div class="container-site grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <h2 class="h-section" data-reveal>{copy.faq}</h2>
+      <FaqList items={c.faq} />
+    </div>
+  </section>
+
+  <!-- Related treatments -->
+  <section class:list={['section', !hasMiddle && 'bg-sand']}>
+    <div class="container-site">
+      <h2 class="h-section" data-reveal>{copy.related}</h2>
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {related.slice(0, 3).map((tr) => <TreatmentCard lang={lang} treatment={tr} />)}
+      </div>
+    </div>
+  </section>
+
+  <ContactSection lang={lang} selected={treatment.id} />
+</BaseLayout>

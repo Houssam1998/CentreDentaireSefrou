@@ -1,0 +1,30 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { type Lang, useT } from '@/i18n';
+import { site, whatsappLink } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  text: string;
+  tone?: 'ivory' | 'sand';
+}
+const { lang, text, tone = 'ivory' } = Astro.props;
+const t = useT(lang);
+---
+
+<!-- One-line conversion strip placed between sections -->
+<div class:list={[tone === 'sand' ? 'bg-sand' : 'bg-ivory']}>
+  <div class="container-site">
+    <div class="flex flex-col items-start gap-5 border-y border-line py-7 sm:flex-row sm:items-center sm:justify-between" data-reveal>
+      <p class="font-serif text-2xl leading-snug sm:text-[1.7rem]">{text}</p>
+      <div class="flex w-full flex-wrap gap-3 sm:w-auto sm:shrink-0">
+        <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn btn-primary flex-1 sm:flex-none" data-cta="strip-book">
+          <Icon name="calendar" />{t('cta.book')}
+        </a>
+        <a href={whatsappLink(t('whatsapp.greeting'))} target="_blank" rel="noopener" class="btn btn-outline flex-1 sm:flex-none" data-cta="strip-whatsapp">
+          <Icon name="whatsapp" class="text-whatsapp" />WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

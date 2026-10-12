@@ -1,0 +1,159 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import CtaStrip from '@/components/ui/CtaStrip.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+import ScannerVideo from '@/components/ui/ScannerVideo.astro';
+import { type Lang, path, routes, useT } from '@/i18n';
+import { breadcrumbSchema } from '@/lib/schema';
+import heroImage from '@/assets/media/clinic/logo-wall.jpg';
+import room1 from '@/assets/media/clinic/treatment-room-1.jpg';
+import room2 from '@/assets/media/clinic/treatment-room-2.jpg';
+import waiting from '@/assets/media/clinic/waiting-room.jpg';
+import reception from '@/assets/media/clinic/reception.jpg';
+import xray from '@/assets/media/clinic/xray-unit.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const copy = {
+  fr: {
+    seoTitle: 'Le Centre — cabinet dentaire moderne à Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Découvrez le Centre Dentaire Sefrou : un cabinet moderne, lumineux et rigoureux en matière d’hygiène, équipé de technologies récentes.',
+    eyebrow: 'Le Centre',
+    title: 'Un lieu pensé pour <em>votre confort</em>',
+    text: 'Ouvert le 22 juin 2026 : lumière naturelle, équipements numériques et hygiène irréprochable. Bienvenue au Centre Dentaire Sefrou.',
+    introTitle: 'Moderne, chaleureux, <em>rassurant</em>',
+    intro: 'Dès l’accueil, tout est pensé pour vous mettre à l’aise : une salle d’attente calme, des explications claires et une équipe disponible. Dans les salles de soins, les équipements de dernière génération permettent des traitements plus précis et plus confortables.',
+    techEyebrow: 'Technologie & hygiène',
+    techTitle: 'Le meilleur de la dentisterie <em>moderne</em>',
+    tech: [
+      { icon: 'cpu', title: 'Radiographie 3D (CBCT)', text: 'Un appareil panoramique 3D à faisceau conique (CBCT) sur place : panoramique et imagerie 3D des os et des dents, pour un diagnostic précis et la planification des implants.' },
+      { icon: 'sparkles', title: 'Empreintes optiques & 3D', text: 'Scanner intra-oral et conception numérique du sourire : fini la pâte à empreinte, place à la précision.' },
+      { icon: 'shield', title: 'Stérilisation contrôlée', text: 'Autoclave, traçabilité et matériel à usage unique selon des protocoles stricts.' },
+      { icon: 'heart', title: 'Confort patient', text: 'Fauteuils ergonomiques, anesthésie douce et ambiance apaisante.' },
+    ],
+    galleryTitle: 'Visite <em>en images</em>',
+    alts: ["Mur d'accueil lumineux", 'Salle de soins', "Salle d'attente", 'Salle de soins avec scanner intra-oral', 'Accueil', 'Radiographie panoramique 3D (CBCT)'],
+    strip: 'Venez découvrir le centre lors de votre première consultation.',
+  },
+  en: {
+    seoTitle: 'The Centre — modern dental clinic in Sefrou | Centre Dentaire Sefrou',
+    seoDesc: 'Discover Centre Dentaire Sefrou: a modern, bright clinic with rigorous hygiene standards and recent technology.',
+    eyebrow: 'The Centre',
+    title: 'A place designed for <em>your comfort</em>',
+    text: 'Opened on 22 June 2026: natural light, digital equipment and impeccable hygiene. Welcome to Centre Dentaire Sefrou.',
+    introTitle: 'Modern, warm, <em>reassuring</em>',
+    intro: 'From the moment you arrive, everything is designed to put you at ease: a calm waiting room, clear explanations and an attentive team. In the treatment rooms, latest-generation equipment makes care more precise and more comfortable.',
+    techEyebrow: 'Technology & hygiene',
+    techTitle: 'The best of <em>modern</em> dentistry',
+    tech: [
+      { icon: 'cpu', title: '3D imaging (CBCT)', text: 'An on-site 3D panoramic cone-beam (CBCT) unit: panoramic and 3D imaging of bone and teeth for accurate diagnosis and implant planning.' },
+      { icon: 'sparkles', title: 'Optical impressions & 3D', text: 'Intraoral scanner and digital smile design: no more impression paste, just precision.' },
+      { icon: 'shield', title: 'Controlled sterilisation', text: 'Autoclave, traceability and single-use equipment following strict protocols.' },
+      { icon: 'heart', title: 'Patient comfort', text: 'Ergonomic chairs, gentle anaesthesia and a calming atmosphere.' },
+    ],
+    galleryTitle: 'A visit <em>in pictures</em>',
+    alts: ['Backlit reception wall', 'Treatment room', 'Waiting room', 'Treatment room with intraoral scanner', 'Reception', '3D panoramic X-ray (CBCT)'],
+    strip: 'Come and discover the centre at your first consultation.',
+  },
+}[lang] as {
+  seoTitle: string; seoDesc: string; eyebrow: string; title: string; text: string; introTitle: string; intro: string;
+  techEyebrow: string; techTitle: string; tech: { icon: 'cpu' | 'sparkles' | 'shield' | 'heart'; title: string; text: string }[];
+  galleryTitle: string; alts: string[]; strip: string;
+};
+
+// Real clinic photos (first = large tile; the 6th is hidden on phones to keep 2 even columns)
+const gallery = [
+  { src: heroImage, position: '50% 42%' },
+  { src: room2, position: '50% 60%' },
+  { src: waiting, position: '50% 65%' },
+  { src: room1, position: '50% 60%' },
+  { src: reception, position: '50% 80%' },
+  { src: xray, position: '50% 35%' },
+];
+const crumbs = [
+  { name: t('breadcrumb.home'), href: path('home', lang) },
+  { name: t('nav.centre'), href: path('centre', lang) },
+];
+---
+
+<BaseLayout lang={lang} title={copy.seoTitle} description={copy.seoDesc} alternate={routes.centre[lang === 'fr' ? 'en' : 'fr']} schema={[breadcrumbSchema(crumbs, Astro.site)]}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.title} text={copy.text} image={heroImage} crumbs={crumbs} />
+
+  <section class="section">
+    <div class="container-site grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <SectionHeading title={copy.introTitle} />
+        <p class="lead mt-6" data-reveal>{copy.intro}</p>
+      </div>
+      <div class="relative" data-reveal>
+        <div class="overflow-hidden rounded-[2rem]">
+          <Image src={room1} alt={copy.alts[3]} widths={[480, 800, 1100]} sizes="(min-width: 1024px) 45vw, 92vw" class="aspect-[4/3] w-full object-cover object-[50%_62%]" />
+        </div>
+        <div class="absolute -bottom-8 -left-4 hidden w-44 overflow-hidden rounded-2xl border-4 border-ivory shadow-lift sm:block lg:-left-10 lg:w-56">
+          <Image src={reception} alt="" widths={[300, 450]} sizes="14rem" class="aspect-square w-full object-cover object-[50%_82%]" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-ink text-white">
+    <div class="container-site grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+      <div class="lg:sticky lg:top-28 lg:self-start">
+        <SectionHeading eyebrow={copy.techEyebrow} title={copy.techTitle} tone="light" />
+        <div class="mt-10 hidden overflow-hidden rounded-3xl lg:block" data-reveal>
+          <Image src={xray} alt={copy.alts[5]} widths={[480, 720]} sizes="35vw" class="aspect-[4/3] w-full object-cover object-[50%_30%]" />
+        </div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {
+          copy.tech.map((item) => (
+            <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-7" data-reveal>
+              <span class="inline-flex size-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
+                <Icon name={item.icon} class="size-6" />
+              </span>
+              <h3 class="mt-6 font-serif text-2xl">{item.title}</h3>
+              <p class="mt-2 text-white/65">{item.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="container-site mt-12 lg:mt-16">
+      <ScannerVideo lang={lang} tone="dark" />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <SectionHeading title={copy.galleryTitle} />
+      <!-- Bento grid: 1 large + 5 tiles fills 3 columns exactly (the 6th tile is hidden on phones to keep 2 even columns) -->
+      <div class="mt-12 grid auto-rows-[9.5rem] grid-cols-2 gap-3 sm:auto-rows-[13rem] md:grid-cols-3 md:gap-4 lg:auto-rows-[16rem]">
+        {
+          gallery.slice(0, 6).map((img, i) => (
+            <div class:list={['group relative overflow-hidden rounded-3xl', i === 0 && 'col-span-2 row-span-2', i === 5 && 'max-md:hidden']} data-reveal>
+              <Image
+                src={img.src}
+                alt={copy.alts[i]}
+                widths={[400, 640, 900, 1200]}
+                sizes={i === 0 ? '(min-width: 768px) 66vw, 100vw' : '(min-width: 768px) 33vw, 50vw'}
+                class="absolute inset-0 size-full object-cover transition-transform duration-[1.2s] group-hover:scale-105"
+                style={`object-position:${img.position}`}
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaStrip lang={lang} text={copy.strip} tone="sand" />
+  <ContactSection lang={lang} />
+</BaseLayout>

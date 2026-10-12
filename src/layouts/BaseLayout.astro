@@ -1,0 +1,172 @@
+---
+import '@/styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import MobileActionBar from '@/components/layout/MobileActionBar.astro';
+import WhatsAppFloat from '@/components/layout/WhatsAppFloat.astro';
+import { site, fullAddress } from '@/data/site';
+import { type Lang, treatmentPath, useT } from '@/i18n';
+import { treatments } from '@/data/treatments';
+import ogDefault from '@/assets/media/clinic/logo-wall.jpg';
+import doctorPhoto from '@/assets/media/clinic/doctor-seated.jpg';
+import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import cormorantWoff2 from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff2?url';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Path of the same page in the other language, used by the language switcher and hreflang. */
+  alternate: string;
+  ogImage?: ImageMetadata;
+  /** Extra JSON-LD objects for this page (FAQ, breadcrumbs, …). */
+  schema?: Record<string, unknown>[];
+  /** Keep the page out of search results (404, utility pages). */
+  noindex?: boolean;
+}
+
+const { lang, title, description, alternate, ogImage = ogDefault, schema = [], noindex = false } = Astro.props;
+const t = useT(lang);
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternateUrl = new URL(alternate, Astro.site);
+const frUrl = lang === 'fr' ? canonical : alternateUrl;
+const enUrl = lang === 'en' ? canonical : alternateUrl;
+
+const doctorJpg = await getImage({ src: doctorPhoto, width: 800, format: 'jpg' });
+const og = await getImage({ src: ogImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site);
+
+const dentistSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Dentist',
+  '@id': new URL('/#dentist', Astro.site).href,
+  name: site.name,
+  alternateName: site.nameAr,
+  url: new URL('/', Astro.site).href,
+  image: ogUrl.href,
+  logo: new URL('/brand/logo-ink.png', Astro.site).href,
+  telephone: site.phoneHref.replace('tel:', ''),
+  email: site.email,
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    postalCode: site.address.postalCode,
+    addressCountry: site.address.country,
+  },
+  hasMap: site.mapsUrl,
+  potentialAction: {
+    '@type': 'ReserveAction',
+    target: { '@type': 'EntryPoint', urlTemplate: site.bookingUrl, actionPlatform: ['https://schema.org/DesktopWebPlatform', 'https://schema.org/MobileWebPlatform'] },
+  },
+  openingHoursSpecification: site.hours
+    .filter((h) => h.opens)
+    .map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.schema, opens: h.opens, closes: h.closes })),
+  founder: { '@type': 'Person', name: site.doctorFull, image: new URL(doctorJpg.src, Astro.site).href, jobTitle: lang === 'fr' ? 'Chirurgien-dentiste' : 'Dental surgeon' },
+  foundingDate: site.openedOn,
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: site.stats.rating, reviewCount: site.stats.reviews, bestRating: 5 },
+  knowsLanguage: ['ar', 'fr', 'en'],
+  sameAs: [...Object.values(site.social).filter((u) => new URL(u).pathname.length > 1), site.mapsUrl, site.bookingUrl],
+  areaServed: site.areaServed.map((name) => ({ '@type': 'City', name })),
+  ...(site.geo ? { geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng } } : {}),
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: lang === 'fr' ? 'Soins dentaires' : 'Dental treatments',
+    itemListElement: treatments.map((tr) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'MedicalProcedure', name: tr[lang].title, url: new URL(treatmentPath(tr[lang].slug, lang), Astro.site).href },
+    })),
+  },
+  description: lang === 'fr' ? `Cabinet dentaire à Sefrou — ${fullAddress}` : `Dental clinic in Sefrou — ${fullAddress}`,
+};
+const jsonLd = [dentistSchema, ...schema];
+
+// Google tag (GA4 / Google Ads) is only emitted once an ID is configured in site.ts
+const gtagIds = [site.analytics.ga4, site.analytics.googleAds].filter(Boolean);
+---
+
+<!doctype html>
+<html lang={lang === 'fr' ? 'fr-MA' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical.href} />
+    <link rel="alternate" hreflang="fr" href={frUrl.href} />
+    <link rel="alternate" hreflang="en" href={enUrl.href} />
+    <link rel="alternate" hreflang="x-default" href={frUrl.href} />
+
+    <meta name="theme-color" content="#14202b" />
+    <link rel="icon" type="image/png" href="/brand/favicon.png" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:locale:alternate" content={lang === 'fr' ? 'en_US' : 'fr_MA'} />
+    <meta property="og:locale" content={lang === 'fr' ? 'fr_MA' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl.href} />
+    {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
+    {site.bingSiteVerification && <meta name="msvalidate.01" content={site.bingSiteVerification} />}
+
+    <!-- Preload the two fonts used above the fold -->
+    <link rel="preload" href={interWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={cormorantWoff2} as="font" type="font/woff2" crossorigin />
+
+    <!-- Enables reveal animations only when JS runs and the visitor accepts motion -->
+    <script is:inline>
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('js-motion');
+      }
+    </script>
+
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    {
+      gtagIds.length > 0 && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gtagIds[0]}`} />
+          <script is:inline define:vars={{ gtagIds, conversions: site.analytics.conversions, adsId: site.analytics.googleAds }}>
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () { window.dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            gtagIds.forEach(function (id) { window.gtag('config', id); });
+            window.__cds = { adsId: adsId, conversions: conversions };
+          </script>
+        </>
+      )
+    }
+    <slot name="head" />
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only z-[100] rounded-full bg-ink px-5 py-3 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >{t('nav.skip')}</a
+    >
+    <Header lang={lang} alternate={alternate} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <WhatsAppFloat lang={lang} />
+    <MobileActionBar lang={lang} />
+
+    <script>
+      import '@/scripts/main';
+    </script>
+  </body>
+</html>

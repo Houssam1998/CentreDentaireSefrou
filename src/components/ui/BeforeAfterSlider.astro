@@ -1,0 +1,91 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/i18n';
+import type { Case } from '@/data/content';
+import { site } from '@/data/site';
+
+interface Props {
+  lang: Lang;
+  item: Case;
+  /** Hide the caption when the surrounding section already shows the title. */
+  caption?: boolean;
+}
+const { lang, item, caption = true } = Astro.props;
+const title = item.title[lang];
+
+const labels = {
+  fr: { before: 'Avant', after: 'Après', slider: 'Comparer avant et après', real: `Cas réel · ${site.doctor}`, illustration: 'Illustration', views: 'Choisir la vue' },
+  en: { before: 'Before', after: 'After', slider: 'Compare before and after', real: `Real case · ${site.doctor}`, illustration: 'Illustration', views: 'Choose the view' },
+}[lang];
+---
+
+<figure data-reveal data-case>
+  {
+    item.views.length > 1 && (
+      <div class="mb-3 inline-flex rounded-full border border-line bg-white p-1" role="group" aria-label={labels.views}>
+        {item.views.map((v, i) => (
+          <button
+            type="button"
+            data-case-view={i}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            class="min-h-10 rounded-full px-4 text-sm font-medium text-muted transition-colors aria-pressed:bg-ink aria-pressed:text-white"
+          >
+            {v.label[lang]}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    item.views.map((v, i) => (
+      <div
+        data-compare
+        data-case-panel={i}
+        hidden={i > 0}
+        class="group relative aspect-[4/3] touch-pan-y overflow-hidden rounded-3xl bg-sand select-none [--pos:50%]"
+      >
+        <Image src={v.after} alt={`${title} — ${labels.after}`} widths={[480, 800, 1100]} sizes="(min-width: 1024px) 45vw, 92vw" class="absolute inset-0 size-full object-cover" />
+        <div class="absolute inset-0 [clip-path:inset(0_calc(100%-var(--pos))_0_0)]">
+          <Image src={v.before} alt={`${title} — ${labels.before}`} widths={[480, 800, 1100]} sizes="(min-width: 1024px) 45vw, 92vw" class="absolute inset-0 size-full object-cover" />
+        </div>
+
+        <span class="pointer-events-none absolute top-4 left-4 rounded-full bg-ink/70 px-3 py-1 text-xs font-medium tracking-wide text-white uppercase backdrop-blur">{labels.before}</span>
+        <span class="pointer-events-none absolute top-4 right-4 rounded-full bg-white/85 px-3 py-1 text-xs font-medium tracking-wide text-ink uppercase backdrop-blur">{labels.after}</span>
+        {item.real ? (
+          <span class="pointer-events-none absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+            <Icon name="checkCircle" class="size-3.5" />
+            {labels.real}
+          </span>
+        ) : (
+          <span class="pointer-events-none absolute bottom-4 left-4 rounded-full bg-white/80 px-2.5 py-0.5 text-[0.7rem] text-muted backdrop-blur">{labels.illustration}</span>
+        )}
+
+        <div class="pointer-events-none absolute inset-y-0 left-[var(--pos)] w-0.5 -translate-x-1/2 bg-white shadow-[0_0_12px_rgb(0_0_0/0.3)]">
+          <span class="absolute top-1/2 left-1/2 inline-flex size-12 -translate-1/2 items-center justify-center rounded-full bg-white text-ink shadow-lift transition-transform group-active:scale-95">
+            <Icon name="drag" class="size-5" />
+          </span>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="50"
+          aria-label={`${labels.slider} : ${title} (${v.label[lang]})`}
+          class="absolute inset-0 size-full cursor-ew-resize touch-pan-y opacity-0"
+        />
+      </div>
+    ))
+  }
+
+  {
+    caption && (
+      <figcaption class="mt-5">
+        <p class="font-serif text-2xl">{title}</p>
+        <p class="mt-1 text-muted">{item.text[lang]}</p>
+      </figcaption>
+    )
+  }
+</figure>

@@ -1,0 +1,304 @@
+@import 'tailwindcss';
+
+/* Self-hosted fonts (latin subset covers French) — no render-blocking third-party request */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource/cormorant-garamond/latin-500.css';
+@import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/cormorant-garamond/latin-500-italic.css';
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --color-ivory: #faf8f4;
+  --color-sand: #efe9df;
+  --color-sand-dark: #e4dccd;
+  --color-ink: #14202b;
+  --color-ink-soft: #24313d;
+  --color-primary: #0f6e77;
+  --color-primary-dark: #0b5960;
+  --color-primary-soft: #e2efee;
+  --color-accent: #c8a97e;
+  --color-accent-dark: #9a7b4f;
+  --color-muted: #5b6672;
+  --color-line: #e6e0d6;
+  --color-whatsapp: #25d366;
+
+  --font-serif: 'Cormorant Garamond', 'Georgia', serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-soft: 0 1px 2px rgb(20 32 43 / 0.04), 0 8px 24px -8px rgb(20 32 43 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(20 32 43 / 0.05), 0 24px 48px -16px rgb(20 32 43 / 0.22);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    @apply bg-ivory font-sans text-ink antialiased;
+    font-size: 1rem;
+    line-height: 1.65;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    @apply font-serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ---------- Components ---------- */
+@layer components {
+  .container-site {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-site {
+      padding-inline: 2rem;
+    }
+  }
+
+  .section {
+    padding-block: clamp(4rem, 9vw, 7.5rem);
+    /* Skip layout/paint of offscreen sections until they approach the viewport */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-3 text-xs font-semibold tracking-[0.22em] text-primary uppercase;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+  .eyebrow-light {
+    @apply text-accent;
+  }
+
+  .h-display {
+    font-size: clamp(2.6rem, 7vw, 5.25rem);
+  }
+  .h-section {
+    font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+  }
+  .h-card {
+    font-size: clamp(1.5rem, 2.4vw, 1.85rem);
+  }
+  .lead {
+    @apply text-muted;
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  }
+
+  /* Buttons — min 48px tall for touch */
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-6 text-[0.95rem] font-medium whitespace-nowrap transition-all duration-300;
+    transition-timing-function: var(--ease-out-soft);
+  }
+  .btn svg {
+    @apply size-[1.1rem] shrink-0;
+  }
+  .btn-primary {
+    @apply bg-primary text-white shadow-[0_10px_24px_-10px_rgb(15_110_119/0.7)] hover:-translate-y-0.5 hover:bg-primary-dark;
+  }
+  .btn-light {
+    @apply bg-white text-ink hover:-translate-y-0.5 hover:bg-ivory;
+  }
+  .btn-outline {
+    @apply border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-white;
+  }
+  .btn-outline-light {
+    @apply border border-white/40 text-white backdrop-blur-sm hover:border-white hover:bg-white hover:text-ink;
+  }
+  .btn-whatsapp {
+    @apply bg-whatsapp text-white hover:-translate-y-0.5 hover:brightness-95;
+  }
+
+  .link-arrow {
+    @apply inline-flex min-h-11 items-center gap-2 font-medium text-primary transition-colors hover:text-primary-dark;
+  }
+  .link-arrow svg {
+    @apply size-4 transition-transform duration-300;
+  }
+  .link-arrow:hover svg {
+    transform: translateX(4px);
+  }
+
+  .card {
+    @apply rounded-3xl border border-line bg-white shadow-soft;
+  }
+
+  /* Rich text inside treatment pages */
+  .prose-site p + p {
+    margin-top: 1rem;
+  }
+
+  /* Hide scrollbar on swipe carousels while keeping them scrollable */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Motion ---------- */
+/* Scroll reveals (scripts/modules/reveal.ts adds `.is-in`). Only active when motion is allowed. */
+html.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+html.js-motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+html.js-motion [data-img-reveal] {
+  clip-path: inset(10% 10% 10% 10% round 2rem);
+  transform: scale(1.1);
+  transition:
+    clip-path 1.4s var(--ease-out-soft),
+    transform 1.4s var(--ease-out-soft);
+}
+html.js-motion [data-img-reveal].is-in {
+  clip-path: inset(0 0 0 0 round 0);
+  transform: none;
+}
+
+/* Home hero photo crossfade (4 slides × 6s). Slide 0 starts already visible (negative delay)
+   so it is painted immediately; with reduced motion only the first photo is shown. */
+.hero-slide {
+  opacity: 0;
+}
+.hero-slide:first-child {
+  opacity: 1;
+}
+@keyframes hero-slide {
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  6% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+html.js-motion .hero-slide {
+  animation: hero-slide 24s linear infinite both;
+  animation-delay: calc(var(--i) * 6s - 1.4s);
+  will-change: opacity, transform;
+}
+
+/* Hero entrance: pure CSS so it starts with the first paint (no JS on the critical path) */
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html.js-motion [data-hero-line] {
+  animation: hero-in 1s var(--ease-out-soft) both;
+}
+html.js-motion [data-hero-line]:nth-child(2) {
+  animation-delay: 0.1s;
+}
+html.js-motion [data-hero-line]:nth-child(3) {
+  animation-delay: 0.2s;
+}
+html.js-motion [data-hero-line]:nth-child(4) {
+  animation-delay: 0.3s;
+}
+html.js-motion [data-hero-line]:nth-child(n + 5) {
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lenis smooth scroll (desktop only) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Mobile bottom action bar leaves room at the end of the page */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* FAQ <details> marker reset */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
