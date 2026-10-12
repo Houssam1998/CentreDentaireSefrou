@@ -8,5 +8,5 @@ Thumbs.db
 
 # Raw source material — not needed for the build (processed copies live in src/assets).
 # Kept out of the public repository: contains personal data (CV) and original patient photos.
-assets/
-before_after/
+/assets/
+/before_after/
