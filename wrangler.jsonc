@@ -1,0 +1,14 @@
+// Cloudflare Workers deployment: serves the static build in ./dist
+// (the name must match the Worker / project name in the Cloudflare dashboard)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "centredentairesefrou",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown URLs show the site's own 404 page
+    "not_found_handling": "404-page",
+    // Every page lives at a URL ending in "/" (matches trailingSlash: 'always' in astro.config.mjs)
+    "html_handling": "auto-trailing-slash"
+  }
+}

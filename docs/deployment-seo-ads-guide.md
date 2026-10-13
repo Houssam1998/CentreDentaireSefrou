@@ -74,15 +74,16 @@ git push -u origin main
 `node_modules/` and `dist/` are already excluded by `.gitignore`.
 
 **Step 3. Create the Cloudflare project**
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → select the repository.
-2. Enter the build settings:
-   - Framework preset: **Astro**
+1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Import a repository** → select `Houssam1998/CentreDentaireSefrou`.
+2. Enter the settings:
+   - Project name: `centredentairesefrou`. It must match `name` in `wrangler.jsonc`.
    - Build command: `npm run build`
-   - Output directory: `dist`
-   - Environment variables:
-     - `NODE_VERSION` = `24`
+   - Deploy command: `npx wrangler deploy`. `wrangler.jsonc` in the repo tells it to publish `dist/`.
+   - Build variables (under *Advanced settings*):
      - `SITE_URL` = `https://www.centredentairesefrou.com`
-3. Click **Deploy**. You get a test URL like `centre-dentaire-sefrou.pages.dev`. Click through it on a phone.
+     - Node 24 is picked up from `.nvmrc`. If needed, add `NODE_VERSION` = `24` as well.
+3. Click **Deploy**. You get a test URL like `centredentairesefrou.<account>.workers.dev`. Click through it on a phone.
+4. *(The older "Pages" flow also works: build command `npm run build`, output directory `dist`, same variables.)*
 
 **Step 4. Connect the domain**
 1. Easiest: in Cloudflare, **Add a site** with your domain, then change the domain's nameservers at the registrar to the two Cloudflare nameservers.

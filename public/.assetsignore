@@ -1,0 +1,2 @@
+# Files in dist/ that Cloudflare must not serve publicly (Apache-only config)
+.htaccess
