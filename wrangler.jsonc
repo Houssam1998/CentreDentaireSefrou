@@ -4,6 +4,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "centredentairesefrou",
   "compatibility_date": "2026-10-01",
+  // Custom domains: Cloudflare creates the DNS records and the HTTPS certificates on deploy
+  // (the bare domain is then redirected to www by a Redirect Rule in the dashboard)
+  "routes": [
+    { "pattern": "www.centredentairesefrou.com", "custom_domain": true },
+    { "pattern": "centredentairesefrou.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     // Unknown URLs show the site's own 404 page
