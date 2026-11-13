@@ -1,0 +1,39 @@
+// Studio Instagram — Worker Cloudflare : sert l'éditeur (./dist) et l'API de l'espace d'équipe (/api/*, base D1).
+// Construire : npm run ig:build   ·   Publier : npm run ig:deploy   ·   Tester en local : npm run ig:cloud
+// L'accès est protégé par Cloudflare Access (connexion par e-mail) : voir instagram/README.md.
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "centredentairesefrou-studio",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Seule l'adresse protégée par Access est publique (pas d'adresse *.workers.dev ni d'aperçus)
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "studio.centredentairesefrou.com", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Application d'une seule page : toute adresse inconnue renvoie l'éditeur ; /api/* passe par le Worker
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "studio-centre-dentaire-sefrou",
+      // Rempli à la création de la base (npx wrangler d1 create studio-centre-dentaire-sefrou)
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "./worker/migrations"
+    }
+  ],
+  "vars": {
+    // Ne jamais mettre « development » ici : réservé au fichier local .dev.vars
+    "ENVIRONMENT": "production",
+    // Équipe Cloudflare Zero Trust et identifiant (AUD) de l'application Access du Studio
+    "ACCESS_TEAM": "",
+    "ACCESS_AUD": "",
+    // Liste de secours des adresses autorisées (en plus de la règle Access)
+    "ALLOWED_EMAILS": ""
+  },
+  "observability": { "enabled": true }
+}

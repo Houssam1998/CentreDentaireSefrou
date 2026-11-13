@@ -1,0 +1,187 @@
+/* =====================================================================
+   Centre Dentaire Sefrou — charte Instagram « Lumière & lignes d'or »
+   Inspirée du cabinet réel : mur grège, arches rétro-éclairées, logo doré.
+   Modifier une couleur ici la change sur toutes les publications.
+   ===================================================================== */
+@import '@fontsource/cormorant-garamond/latin-500.css';
+@import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/cormorant-garamond/latin-500-italic.css';
+@import '@fontsource/cormorant-garamond/latin-600-italic.css';
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource/noto-kufi-arabic/arabic-500.css';
+@import '@fontsource/noto-kufi-arabic/arabic-700.css';
+@import '@fontsource/noto-naskh-arabic/arabic-500.css';
+@import '@fontsource/noto-naskh-arabic/arabic-600.css';
+@import '@fontsource/aref-ruqaa/arabic-400.css';
+@import '@fontsource/aref-ruqaa/arabic-700.css';
+
+:root {
+  /* Palette — reprise du site (src/styles/global.css) + le grège du mur d'accueil */
+  --ivory: #faf8f4;
+  --sand: #efe9df;
+  --greige: #e6e0d7;
+  --greige-deep: #d9d2c7;
+  --ink: #14202b;
+  --ink-soft: #3a4651;
+  --muted: #6b7480;
+  --teal: #0f6e77;
+  --teal-dark: #0b5960;
+  --teal-soft: #e2efee;
+  --gold: #c8a97e;
+  --gold-deep: #9a7b4f;
+  --gold-light: #e8d3b0;
+  --glow: rgb(255 208 140 / 0.62);
+  --night: #0f2226;
+  --night-2: #16313a;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter Variable', Inter, system-ui, sans-serif;
+  --kufi: 'Noto Kufi Arabic', 'Noto Naskh Arabic', sans-serif;
+  --naskh: 'Noto Naskh Arabic', 'Noto Kufi Arabic', serif;
+  --ruqaa: 'Aref Ruqaa', 'Noto Naskh Arabic', serif;
+
+  --pad: 76px; /* marge latérale : reste dans la zone 3:4 de la grille du profil */
+}
+
+/* ---------- Cadre ---------- */
+.ig {
+  position: relative;
+  width: 1080px;
+  height: 1350px;
+  overflow: hidden;
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 70% at 50% -10%, #fffdf9 0%, transparent 60%),
+    linear-gradient(180deg, var(--ivory) 0%, var(--sand) 62%, var(--greige) 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 64px var(--pad) 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: lining-nums;
+}
+.ig *, .ig *::before, .ig *::after { box-sizing: border-box; }
+.ig[data-size='tall'] { height: 1920px; padding-top: 220px; }
+
+/* Ton sombre : soirée au cabinet, lignes d'or lumineuses */
+.ig[data-tone='night'] {
+  color: var(--ivory);
+  background:
+    radial-gradient(90% 60% at 50% 0%, #1d3d45 0%, transparent 70%),
+    linear-gradient(180deg, var(--night-2) 0%, var(--night) 100%);
+}
+.ig[data-tone='night'] .t-body, .ig[data-tone='night'] .t-ar-body { color: #d9e2e2; }
+.ig[data-tone='night'] .t-h1 { color: var(--ivory); }
+.ig[data-tone='night'] .t-h1-ar { color: var(--gold-light); }
+.ig[data-tone='night'] .ig-head { color: var(--gold-light); }
+.ig[data-tone='night'] .ig-foot { color: #cfd8d8; border-color: rgb(200 169 126 / 0.4); }
+.ig[data-tone='night'] .card { background: rgb(255 255 255 / 0.05); border-color: rgb(200 169 126 / 0.35); }
+
+/* Ton grège : le mur de l'accueil */
+.ig[data-tone='greige'] {
+  background:
+    radial-gradient(80% 50% at 50% 30%, #f3efe8 0%, transparent 70%),
+    linear-gradient(180deg, #ebe6de 0%, var(--greige-deep) 100%);
+}
+
+/* ---------- Calques de fond ---------- */
+.ig-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.ig > :where(:not(.ig-bg)) { position: relative; z-index: 1; }
+.ig-bg svg { position: absolute; }
+
+/* Arches rétro-éclairées (les panneaux du mur d'accueil) */
+.glow-arch {
+  position: absolute;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e9e4dc, #ddd6cb);
+  box-shadow:
+    0 0 0 1.5px rgb(255 226 180 / 0.9),
+    0 0 28px 6px var(--glow),
+    0 0 90px 18px rgb(255 214 150 / 0.28);
+}
+.ig[data-tone='night'] .glow-arch {
+  background: linear-gradient(180deg, #1b363d, #142a30);
+  box-shadow: 0 0 0 1.5px rgb(255 214 150 / 0.75), 0 0 34px 6px rgb(255 196 120 / 0.45), 0 0 110px 24px rgb(255 196 120 / 0.18);
+}
+
+/* ---------- En-tête : le vrai logo, vectorisé ---------- */
+.ig-head { display: flex; align-items: center; gap: 18px; color: var(--ink); }
+.ig-head .mark { width: 70px; height: 70px; color: var(--gold-deep); flex: none; }
+.ig-head .mark path { stroke: currentColor; stroke-width: 16px; }
+.ig-head .mark svg, .logo-ar svg, .logo-fr svg { display: block; width: 100%; height: 100%; }
+.ig-head .names { display: flex; flex-direction: column; gap: 7px; }
+.logo-ar { width: 232px; height: 27px; }
+.logo-fr { width: 232px; height: 17px; }
+.ig-head.center { justify-content: center; }
+.ig-head .series { margin-left: auto; }
+
+/* ---------- Typographie ---------- */
+.t-kicker {
+  display: inline-flex; align-items: center; gap: 14px;
+  font: 600 21px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-deep);
+}
+.t-kicker::before { content: ''; width: 44px; height: 2px; background: currentColor; }
+.t-h1 { font: 600 92px/0.98 var(--serif); letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+.t-h1 em { font-style: italic; color: var(--teal); }
+.ig[data-tone='night'] .t-h1 em { color: #f0d6a8; }
+.t-h1-ar { font: 700 50px/1.55 var(--kufi); color: var(--teal); margin: 0; direction: rtl; text-align: left; }
+/* Dans les blocs centrés, l'arabe se centre aussi */
+.hr-head .t-h1-ar, .ct .t-h1-ar, .vf-q .t-h1-ar, .ct .t-ar-body, .vf-a .t-ar-body { text-align: center; }
+.t-h2 { font: 600 52px/1.05 var(--serif); margin: 0; }
+.t-body { font: 400 29px/1.45 var(--sans); color: var(--ink-soft); margin: 0; }
+.t-body b { font-weight: 650; color: var(--ink); }
+.t-ar-body { font: 500 31px/1.7 var(--naskh); color: var(--ink-soft); margin: 0; direction: rtl; }
+.t-small { font: 500 22px/1.4 var(--sans); color: var(--muted); }
+.t-ar-small { font: 500 23px/1.6 var(--naskh); color: var(--muted); direction: rtl; }
+.rtl { direction: rtl; }
+.t-h1, .t-h1-ar, .t-h2, .t-ar-body, .t-ar-small, .ar { text-wrap: balance; }
+.t-body, .t-small { text-wrap: pretty; }
+.gold { color: var(--gold-deep); }
+.teal { color: var(--teal); }
+.rule { height: 2px; width: 120px; background: linear-gradient(90deg, var(--gold), transparent); border: 0; margin: 0; }
+.rule.center { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--gold), transparent); width: 240px; }
+
+/* ---------- Pièces ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px 12px 18px;
+  border: 1.5px solid var(--gold); border-radius: 999px; background: rgb(255 255 255 / 0.55);
+  font: 600 20px/1 var(--sans); color: var(--gold-deep); white-space: nowrap;
+}
+.badge .ar { font: 600 21px/1 var(--naskh); }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.ig[data-tone='night'] .badge { background: rgb(255 255 255 / 0.06); color: var(--gold-light); }
+
+.card {
+  background: rgb(255 255 255 / 0.62);
+  border: 1.5px solid rgb(200 169 126 / 0.45);
+  border-radius: 28px;
+  box-shadow: 0 1px 2px rgb(20 32 43 / 0.04), 0 18px 40px -22px rgb(20 32 43 / 0.25);
+}
+.icon-disc {
+  width: 76px; height: 76px; flex: none; border-radius: 999px 999px 999px 999px; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 35%, #fffaf0, var(--gold-light)); color: var(--gold-deep);
+  box-shadow: 0 0 0 1.5px var(--gold), 0 0 22px 2px rgb(255 208 140 / 0.45);
+}
+.icon-disc svg { width: 42px; height: 42px; }
+.ig[data-tone='night'] .icon-disc { background: radial-gradient(circle at 50% 35%, #2a4a52, #18343b); color: var(--gold-light); }
+
+/* Photo dans une arche lumineuse */
+.photo-arch {
+  position: relative; overflow: hidden; border-radius: 999px 999px 36px 36px;
+  box-shadow: 0 0 0 2px rgb(255 226 180 / 0.95), 0 0 34px 8px var(--glow), 0 30px 60px -30px rgb(20 32 43 / 0.5);
+  background: var(--greige);
+}
+.photo-arch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-arch.full { border-radius: 999px; }
+
+/* ---------- Pied de page discret ---------- */
+.ig-foot {
+  margin-top: auto; margin-inline: calc(var(--pad) * -1); padding: 26px var(--pad) 34px;
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  border-top: 1.5px solid rgb(200 169 126 / 0.45);
+  font: 500 21px/1 var(--sans); color: var(--ink-soft); white-space: nowrap;
+}
+.ig-foot span { display: inline-flex; align-items: center; gap: 10px; }
+.ig-foot svg { width: 24px; height: 24px; color: var(--gold-deep); }
+.ig[data-tone='night'] .ig-foot svg { color: var(--gold); }

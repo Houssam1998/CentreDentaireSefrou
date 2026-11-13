@@ -10,3 +10,16 @@ Thumbs.db
 # Kept out of the public repository: contains personal data (CV) and original patient photos.
 /assets/
 /before_after/
+
+# Instagram : fichiers générés (npm run ig:render / ig:reel) et captures d'un autre cabinet servant de référence
+/instagram/export/
+/publication_examples/
+/instagram/dist/
+
+# Secrets Cloudflare (jeton API) et données locales de wrangler
+/instagram/.cloudflare.env
+.dev.vars
+.wrangler/
+
+# Rapports Google Ads (données privées, le dépôt est public)
+/Suivi_google_ads/

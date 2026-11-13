@@ -44,11 +44,12 @@ Fait (v2) :
 - [x] Retrait des soins pour enfants (anciennes URL redirigées)
 
 Reste à faire :
-- [ ] **Accord écrit de la patiente** pour la publication des photos avant/après et de la conception 3D
-- [ ] **Accord de l'assistante** visible sur la photo de l'accueil (`clinic/reception.jpg`)
+- [x] **Accord de la patiente** pour la publication des photos avant/après et de la conception 3D (confirmé le 08/11/2026)
+- [x] **Accord de l'assistante** visible sur la photo de l'accueil (`clinic/reception.jpg`) (confirmé le 08/11/2026)
 - [x] Photos réelles du docteur (profil, section d'accueil, fond de la page d'accueil)
 - [ ] E-mail du cabinet (`src/data/site.ts`) et vérification des horaires
-- [ ] Liens Instagram / Facebook / TikTok
+- [x] Lien TikTok (@centre.dentaire.sefrou)
+- [ ] Liens Instagram / Facebook
 - [ ] Faire relire les textes médicaux des soins par le docteur
 - [ ] Mentions légales : n° d'inscription à l'Ordre, hébergeur (`src/views/LegalPage.astro`)
 - [ ] Domaine définitif dans `astro.config.mjs`

@@ -1,0 +1,77 @@
+/* Jetons de couleur par ambiance — doivent rester alignés avec model/tokens.ts (TOKEN_VALUES). */
+.ig {
+  --t-text: #14202b;
+  --t-soft: #3a4651;
+  --t-muted: #6b7480;
+  --t-accent: #0f6e77;
+  --t-gold: #9a7b4f;
+  --t-gold2: #c8a97e;
+  --t-surface: rgb(255 255 255 / 0.62);
+  --t-line: rgb(200 169 126 / 0.45);
+  --t-inverse: #faf8f4;
+  --t-arch: linear-gradient(180deg, #e9e4dc, #ddd6cb);
+  --t-disc: radial-gradient(circle at 50% 35%, #fffaf0, #e8d3b0);
+}
+.ig[data-tone='night'] {
+  --t-text: #faf8f4;
+  --t-soft: #d9e2e2;
+  --t-muted: #aab6b7;
+  --t-accent: #e8d3b0;
+  --t-gold: #e8d3b0;
+  --t-gold2: #c8a97e;
+  --t-surface: rgb(255 255 255 / 0.05);
+  --t-line: rgb(200 169 126 / 0.4);
+  --t-inverse: #14202b;
+  --t-arch: linear-gradient(180deg, #1b363d, #142a30);
+  --t-disc: radial-gradient(circle at 50% 35%, #2a4a52, #18343b);
+}
+
+/* ---------- Page libre (éditeur et export) ---------- */
+.ig.free { display: block; padding: 0; }
+.ig.free > .el { position: absolute; left: 0; top: 0; z-index: auto; transform-origin: 50% 50%; }
+.ig.free .el-bg { position: absolute; inset: 0; z-index: 0; }
+.ig.free .el-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.el-text { width: 100%; overflow-wrap: break-word; white-space: normal; text-wrap: balance; }
+.el-text.w-pretty { text-wrap: pretty; }
+.el-text.w-wrap { text-wrap: wrap; }
+.el-text.nowrap { white-space: nowrap; }
+.el-text em { font-style: italic; color: var(--accent); }
+.el-text b { font-weight: 700; }
+.el-text.kicker { display: inline-flex; align-items: center; gap: 0.6em; white-space: nowrap; }
+.el-text.kicker::before { content: ''; width: 2.1em; height: 2px; background: currentColor; flex: none; }
+.el-text:focus { outline: none; }
+
+.el-image { width: 100%; height: 100%; overflow: hidden; position: relative; background: var(--greige); }
+.el-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; }
+.el-glow { box-shadow: 0 0 0 2px rgb(255 226 180 / 0.95), 0 0 34px 8px var(--glow), 0 30px 60px -30px rgb(20 32 43 / 0.5); }
+
+.el-shape { width: 100%; height: 100%; }
+.el-shape.card { border-radius: 28px; border: 1.5px solid var(--t-line); box-shadow: 0 1px 2px rgb(20 32 43 / 0.04), 0 18px 40px -22px rgb(20 32 43 / 0.25); }
+.el-shape.glow { box-shadow: 0 0 0 1.5px rgb(255 226 180 / 0.9), 0 0 28px 6px var(--glow), 0 0 90px 18px rgb(255 214 150 / 0.28); }
+.ig[data-tone='night'] .el-shape.glow { box-shadow: 0 0 0 1.5px rgb(255 214 150 / 0.75), 0 0 34px 6px rgb(255 196 120 / 0.45), 0 0 110px 24px rgb(255 196 120 / 0.18); }
+
+.el-icon { width: 100%; height: 100%; display: grid; place-items: center; }
+.el-icon svg { width: 100%; height: 100%; display: block; }
+.el-icon.disc { border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fffaf0, var(--gold-light)); box-shadow: 0 0 0 1.5px var(--gold), 0 0 22px 2px rgb(255 208 140 / 0.45); }
+.el-icon.disc svg { width: 55%; height: 55%; }
+.ig[data-tone='night'] .el-icon.disc { background: radial-gradient(circle at 50% 35%, #2a4a52, #18343b); }
+
+.el-motif { width: 100%; height: 100%; overflow: hidden; position: relative; }
+.el-motif > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.el-motif .stars { display: flex; width: 100%; height: 100%; gap: 4%; }
+.el-motif .stars svg { flex: 1; height: 100%; }
+
+.el-comp { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+.el-comp > * { margin: 0; }
+
+/* Composants de la marque, hors de leur modèle d'origine */
+.el-comp { width: max-content; }
+.el-comp .ig-head { gap: 18px; }
+.comp-footer { width: 1080px; }
+.comp-footer .ig-foot { margin: 0; width: 1080px; }
+.comp-hours { margin: 0 !important; width: 940px; }
+.comp-qr { width: 290px; height: 290px; padding: 18px; background: #fff; border-radius: 22px; color: #14202b; box-sizing: border-box; }
+.comp-qr svg { width: 100%; height: 100%; display: block; }
+.comp-vs { position: static !important; transform: none !important; display: grid !important; }
+.el-motif.m-mark path { stroke: currentColor; stroke-width: 14px; }

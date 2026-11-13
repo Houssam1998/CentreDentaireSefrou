@@ -76,7 +76,7 @@ export const site = {
   social: {
     instagram: 'https://www.instagram.com/',
     facebook: 'https://www.facebook.com/',
-    tiktok: 'https://www.tiktok.com/',
+    tiktok: 'https://www.tiktok.com/@centre.dentaire.sefrou',
   },
 
   /** Verifiable figures only: CV (practising since 2020, 5 in-depth courses + degree) and the Google listing. */
