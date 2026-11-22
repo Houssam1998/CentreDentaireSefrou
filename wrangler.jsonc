@@ -22,10 +22,9 @@
     // Every page lives at a URL ending in "/" (matches trailingSlash: 'always' in astro.config.mjs)
     "html_handling": "auto-trailing-slash"
   },
-  // Storage for the Google reviews (replaced every night). Until it exists, the site deploys and works
-  // without it (the curated reviews are shown). To switch the nightly refresh on:
-  //   npx wrangler kv namespace create REVIEWS   → then uncomment the line below with the id it prints
-  // "kv_namespaces": [{ "binding": "REVIEWS", "id": "<id>" }],
+  // Storage for the Google reviews (replaced every night), created on 22/11/2026 with
+  // `npx wrangler kv namespace create REVIEWS`. Without it the site still works (curated reviews only).
+  "kv_namespaces": [{ "binding": "REVIEWS", "id": "5bb48f770fba41059efce2eca2f439e4" }],
   // Every night at 04:00 UTC (05:00 in Morocco): refresh the Google reviews
   "triggers": { "crons": ["0 4 * * *"] }
   // Secret (never in this file): npx wrangler secret put GOOGLE_PLACES_KEY

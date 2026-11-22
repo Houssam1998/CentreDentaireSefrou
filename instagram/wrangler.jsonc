@@ -22,7 +22,7 @@
       "binding": "DB",
       "database_name": "studio-centre-dentaire-sefrou",
       // Rempli à la création de la base (npx wrangler d1 create studio-centre-dentaire-sefrou)
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "c45f338a-f452-4594-bdcb-e37674281a7a",
       "migrations_dir": "./worker/migrations"
     }
   ],

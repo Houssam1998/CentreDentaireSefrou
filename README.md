@@ -82,7 +82,7 @@ Les avis apparaissent **juste après l'accueil** : les visiteurs s'y fient et de
    - créez une **clé API** et limitez-la à cette seule API ;
    - un compte de facturation est requis, mais 60 appels par mois restent dans la partie gratuite.
 2. Renseignez `googlePlaceId` dans `src/data/site.ts`, l'identifiant Google du cabinet, qui commence par `ChIJ`. Cela active aussi le bouton **« Laisser un avis »**.
-3. Créez l'espace de stockage avec `npx wrangler kv namespace create REVIEWS`. Dans `wrangler.jsonc`, décommentez ensuite la ligne `kv_namespaces` et mettez-y l'`id` obtenu. Tant que cette ligne reste en commentaire, le site se déploie normalement et affiche les avis sélectionnés.
+3. Espace de stockage KV `REVIEWS` : créé le 22/11/2026 (son `id` est dans `wrangler.jsonc`). Sans lui, le site fonctionnerait quand même, avec les avis sélectionnés seulement.
 4. Enregistrez la clé avec `npx wrangler secret put GOOGLE_PLACES_KEY`. Elle n'est jamais écrite dans un fichier du dépôt.
 5. Lancez `npm run build && npx wrangler deploy`. Pour un premier remplissage sans attendre la nuit, déclenchez la tâche planifiée depuis le tableau de bord Cloudflare (Worker → Settings → Triggers).
 

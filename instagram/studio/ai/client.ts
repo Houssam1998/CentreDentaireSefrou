@@ -57,6 +57,10 @@ const TOOL_LABELS: Record<string, string> = {
 export async function checkStatus() {
   try {
     const r = await fetch('/api/ai', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+    if (r.status === 401) {
+      set({ status: 'off', statusText: 'L’assistant IA sera disponible quand l’accès privé au Studio (connexion par e-mail) sera activé.' });
+      return;
+    }
     if (!r.ok || !(r.headers.get('Content-Type') ?? '').includes('json')) throw new Error();
     const s = (await r.json()) as { enabled: boolean; model: string; used: number; limit: number };
     set({

@@ -76,16 +76,16 @@ npm run ig:setup -- --emails a@x.com,b@y.com --deploy   # configure l'accès au 
 - **14/10** : début du suivi Google Ads (`Suivi_google_ads/`).
 - **08/11** : kit Instagram/TikTok et Studio v2 (éditeur, espace d'équipe, corbeille 30 jours), lien TikTok sur le site.
 - **13/11** : passation du dossier au Dr El Omari (ce fichier et `LISEZ-MOI_DR_OMARI.md`).
-- **22/11, v5** : horaires officiels ; avis Google remontés juste après l'accueil et rafraîchis chaque nuit ; Studio : publication guidée (type → occasion, textes pré-remplis), calendrier des fêtes, assistant IA Claude ; vérifications GitHub.
+- **22/11, v5** : horaires officiels ; avis Google remontés juste après l'accueil et rafraîchis chaque nuit ; Studio : publication guidée (type → occasion, textes pré-remplis), calendrier des fêtes, assistant IA Claude ; vérifications GitHub. Site et Studio déployés le jour même.
 
 ## Reste à faire
 - [ ] Confirmer l'e-mail du cabinet (`src/data/site.ts`). Horaires officiels confirmés le 22/11/2026 : lun.–ven. 09:00–18:00, sam. 09:00–13:00.
 - [ ] Liens Instagram et Facebook (`site.social`).
 - [ ] Relecture médicale des pages de soins par le docteur.
 - [ ] Mentions légales : n° d'inscription à l'Ordre et hébergeur (`src/views/LegalPage.astro`).
-- [ ] Studio en ligne : activer Cloudflare Access avec les e-mails du docteur et de l'assistante (`npm run ig:setup`). Jusque-là, la version en ligne est l'ancienne version publique.
+- [ ] Studio en ligne : activer Cloudflare Access avec les e-mails du docteur et de l'assistante (`npm run ig:setup`). La v5 est en ligne depuis le 22/11/2026, mais sans Access l'API reste fermée (401) : le Studio fonctionne en mode local (créations dans le navigateur), sans espace d'équipe ni assistant IA.
 - [ ] Google Search Console / Analytics : renseigner les identifiants dans `site.ts` (champs vides = rien n'est chargé).
-- [ ] Avis Google automatiques : clé Google Places (secret `GOOGLE_PLACES_KEY`), `googlePlaceId` dans `site.ts`, KV `REVIEWS` (décommenter `kv_namespaces` dans `wrangler.jsonc` avec son id). Voir `README.md` → « Avis Google ».
+- [x] Avis Google automatiques (22/11/2026) : clé Google Places (secret `GOOGLE_PLACES_KEY`, projet Google Cloud « Centre Dentaire Sefrou », compte prépayé), `googlePlaceId`, KV `REVIEWS`. Voir `README.md` → « Avis Google ».
 - [ ] Assistant IA du Studio : clé API Claude (secret `ANTHROPIC_API_KEY`) avec plafond mensuel sur console.anthropic.com. Voir `instagram/README.md`.
 - [ ] Relecture par le docteur des textes arabes et darija des occasions (`instagram/templates/occasions.js`).
 - [ ] Mettre les mêmes horaires sur la fiche Google Business Profile.
