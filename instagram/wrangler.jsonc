@@ -33,7 +33,11 @@
     "ACCESS_TEAM": "",
     "ACCESS_AUD": "",
     // Liste de secours des adresses autorisées (en plus de la règle Access)
-    "ALLOWED_EMAILS": ""
+    "ALLOWED_EMAILS": "",
+    // Assistant IA : modèle Claude et nombre d'échanges par personne et par jour.
+    // La clé est un secret : npx wrangler secret put ANTHROPIC_API_KEY --config instagram/wrangler.jsonc
+    "AI_MODEL": "claude-opus-5-5",
+    "AI_DAILY_LIMIT": "200"
   },
   "observability": { "enabled": true }
 }

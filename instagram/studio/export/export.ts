@@ -109,6 +109,9 @@ const FORBIDDEN = [
 
 export interface Issue { page: number; text: string; why: string }
 
+/** Raisons pour lesquelles un texte (visuel ou légende) ressemble à de la publicité interdite. */
+export const forbiddenIn = (text: string) => FORBIDDEN.filter((f) => f.re.test(text)).map((f) => f.why);
+
 export function checkProject(project: Project): Issue[] {
   const { w: W, h: H } = FORMATS[project.format];
   const issues: Issue[] = [];

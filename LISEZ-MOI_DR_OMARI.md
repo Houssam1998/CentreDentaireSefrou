@@ -35,9 +35,18 @@ Ne déploie rien, ne pousse rien sur GitHub et ne supprime rien sans me demander
 ## Au quotidien
 - Commencez chaque séance par : *« Récupère les dernières modifications de Houssam (git pull). »*
 - Terminez par : *« Enregistre et envoie mes modifications sur GitHub. »* Claude vous demandera confirmation.
-- Exemples de demandes : *« Change les horaires du samedi »*, *« Ajoute ce nouvel avis Google »*, *« Analyse les derniers rapports Google Ads »*, *« Prépare une publication Instagram sur le détartrage »*.
+- Exemples de demandes : *« Change les horaires du samedi »*, *« Analyse les derniers rapports Google Ads »*, *« Prépare une publication Instagram sur le détartrage »*.
+- **Avis Google** : ils se mettent à jour seuls chaque nuit sur le site. Les avis de 4 et 5 étoiles s'affichent juste après l'accueil. Pensez à demander aux patients satisfaits de laisser un avis : un bouton « Laisser un avis » est prévu sur le site.
+
+## Nouveau dans le Studio (v5)
+- **Nouvelle publication guidée** : choisissez le type de publication, puis l'occasion pour une fête (Aïd al-Fitr, Aïd al-Adha, Ramadan, Trône, Indépendance, Nouvel An, Yennayer, 20 mars…). Les textes en français et en arabe, la légende en darija et les hashtags se remplissent seuls. Les **prochaines occasions** s'affichent avec un bouton « Préparer ».
+- **Assistant IA** (panneau à gauche) : demandez simplement, par exemple *« Prépare la publication de l'Aïd al-Adha »* ou *« Le titre est trop long, raccourcis-le »*. Claude crée ou retouche le visuel et écrit la légende. Le bouton « Annuler ce que l'IA a fait » défait tout d'un coup.
+- **Relisez toujours** les textes arabes et darija, et tout texte de santé, avant de publier.
+- L'assistant IA utilise une **clé API Claude**. Elle est différente de votre abonnement Claude Desktop et facturée à l'usage : quelques centimes par demande, avec un plafond mensuel que vous fixez sur console.anthropic.com. Mise en place : `instagram/README.md`.
 
 ## Important : le jeton Cloudflare
 Le fichier `instagram/.cloudflare.env` contient une **clé d'accès** au compte Cloudflare, qui sert à mettre le site et le Studio en ligne. Ne l'envoyez à personne et ne le publiez nulle part. En cas de doute, cette clé peut être révoquée et remplacée depuis le tableau de bord Cloudflare (Mon profil → Jetons d'API).
+
+Il en va de même pour la **clé Google Places** (avis) et la **clé API Claude** (assistant IA). Elles sont enregistrées comme « secrets » dans Cloudflare et ne sont jamais écrites dans un fichier du dossier.
 
 Les fichiers privés (jeton, CV, photos de patients, rapports Google Ads) ne sont **jamais** envoyés sur GitHub : le dépôt est public.

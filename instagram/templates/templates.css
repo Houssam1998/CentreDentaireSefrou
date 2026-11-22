@@ -154,6 +154,8 @@
 .ft-lant { position: absolute; right: 50px; top: 0; width: 80px; height: 200px; color: var(--gold); }
 .ig:not([data-tone='night']) .ft-cres, .ig:not([data-tone='night']) .ft-lant { color: var(--gold-deep); }
 .ft-logo { width: 190px; height: 190px; color: var(--gold); }
+.ft-ico { width: 170px; height: 170px; }
+.ig:not([data-tone='night']) .ft-ico { color: var(--teal); }
 .ft-title { font: italic 600 64px/1.05 var(--serif); margin: 0; }
 .ft-ar { font: 700 104px/1.25 var(--ruqaa); color: var(--gold-light); margin: 0; direction: rtl; }
 .ig:not([data-tone='night']) .ft-ar { color: var(--teal); }

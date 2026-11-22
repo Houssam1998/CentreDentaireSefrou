@@ -4,6 +4,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "centredentairesefrou",
   "compatibility_date": "2026-10-01",
+  // Small Worker for /api/* only (Google reviews refreshed every night). Every page is still served as a static file.
+  "main": "./site-worker/index.ts",
   // Custom domains: Cloudflare creates the DNS records and the HTTPS certificates on deploy
   // (the bare domain is then redirected to www by a Redirect Rule in the dashboard)
   "routes": [
@@ -12,9 +14,19 @@
   ],
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    // Only /api/* runs the Worker; everything else goes straight to the static files
+    "run_worker_first": ["/api/*"],
     // Unknown URLs show the site's own 404 page
     "not_found_handling": "404-page",
     // Every page lives at a URL ending in "/" (matches trailingSlash: 'always' in astro.config.mjs)
     "html_handling": "auto-trailing-slash"
-  }
+  },
+  // Storage for the Google reviews (replaced every night). Until it exists, the site deploys and works
+  // without it (the curated reviews are shown). To switch the nightly refresh on:
+  //   npx wrangler kv namespace create REVIEWS   → then uncomment the line below with the id it prints
+  // "kv_namespaces": [{ "binding": "REVIEWS", "id": "<id>" }],
+  // Every night at 04:00 UTC (05:00 in Morocco): refresh the Google reviews
+  "triggers": { "crons": ["0 4 * * *"] }
+  // Secret (never in this file): npx wrangler secret put GOOGLE_PLACES_KEY
 }

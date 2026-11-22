@@ -49,6 +49,8 @@ const faq = generalFaq[lang];
   schema={[faqSchema(faq)]}
 >
   <Hero lang={lang} />
+  <!-- Reviews right after the hero: visitors rely on them and rarely scroll far -->
+  <Testimonials lang={lang} />
   <TrustBar lang={lang} />
   <DoctorIntro lang={lang} />
   <ServiceCards lang={lang} />
@@ -57,7 +59,6 @@ const faq = generalFaq[lang];
   <CaseStudy lang={lang} item={cases[0]} tone="light" />
   <CtaStrip lang={lang} text={meta.strip2} />
   <Process lang={lang} />
-  <Testimonials lang={lang} />
   <Gallery lang={lang} />
   <FaqSection lang={lang} items={faq} />
   <ContactSection lang={lang} />

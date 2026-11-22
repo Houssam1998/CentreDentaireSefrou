@@ -3,8 +3,9 @@
  * Données : Cloudflare D1 (créations, photos, modèles). Accès : Cloudflare Access (voir auth.ts).
  */
 import { identify, type AuthEnv } from './auth';
+import { aiStatus, aiTurn, type AiEnv } from './ai';
 
-interface Env extends AuthEnv {
+interface Env extends AuthEnv, AiEnv {
   DB: D1Database;
   ASSETS: Fetcher;
 }
@@ -32,7 +33,7 @@ const meta = (r: Omit<Row, 'data'>) => ({
 const META_COLS = 'id, name, format, pages, version, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by';
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(req);
 
@@ -45,7 +46,7 @@ export default {
     if (!email) return error(401, 'Connexion requise');
 
     try {
-      return await route(req, env, url, email);
+      return await route(req, env, url, email, ctx);
     } catch (e) {
       console.error(e);
       return error(500, 'Erreur du serveur');
@@ -53,13 +54,19 @@ export default {
   },
 } satisfies ExportedHandler<Env>;
 
-async function route(req: Request, env: Env, url: URL, email: string): Promise<Response> {
+async function route(req: Request, env: Env, url: URL, email: string, ctx: ExecutionContext): Promise<Response> {
   const parts = url.pathname.split('/').filter(Boolean).slice(1); // sans « api »
   const [res, id, sub] = parts;
   const m = req.method;
   const now = Date.now();
 
   if (res === 'me' && m === 'GET') return json({ email });
+
+  /* ---------- Assistant IA ---------- */
+  if (res === 'ai' && !id) {
+    if (m === 'GET') return aiStatus(env, email);
+    if (m === 'POST') return aiTurn(req, env, email, ctx);
+  }
 
   /* ---------- Créations ---------- */
   if (res === 'projects') {
@@ -92,14 +99,15 @@ async function route(req: Request, env: Env, url: URL, email: string): Promise<R
       if (cur && !body.force && body.baseVersion !== cur.version) return json({ conflict: true, meta: meta(cur) }, 409);
       const name = String(p.name ?? 'Sans titre').slice(0, 120);
       const format = ['post', 'story', 'square'].includes(String(p.format)) ? String(p.format) : 'post';
-      if (cur) {
-        await env.DB.prepare('UPDATE projects SET name = ?, format = ?, pages = ?, data = ?, version = version + 1, updated_at = ?, updated_by = ?, deleted_at = NULL, deleted_by = NULL WHERE id = ?')
-          .bind(name, format, p.pages.length, JSON.stringify(p), now, email, id).run();
-      } else {
-        await env.DB.prepare('INSERT INTO projects (id, name, format, pages, data, version, created_at, created_by, updated_at, updated_by) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)')
+      // Écriture conditionnelle (atomique) : si quelqu'un a enregistré entre la lecture et l'écriture,
+      // aucune ligne n'est modifiée et on signale le conflit au lieu d'écraser son travail.
+      const res = cur
+        ? await env.DB.prepare('UPDATE projects SET name = ?, format = ?, pages = ?, data = ?, version = version + 1, updated_at = ?, updated_by = ?, deleted_at = NULL, deleted_by = NULL WHERE id = ? AND version = ?')
+          .bind(name, format, p.pages.length, JSON.stringify(p), now, email, id, cur.version).run()
+        : await env.DB.prepare('INSERT INTO projects (id, name, format, pages, data, version, created_at, created_by, updated_at, updated_by) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING')
           .bind(id, name, format, p.pages.length, JSON.stringify(p), now, email, now, email).run();
-      }
       const r = await env.DB.prepare(`SELECT ${META_COLS} FROM projects WHERE id = ?`).bind(id).first<Row>();
+      if (!res.meta.changes) return json({ conflict: true, meta: meta(r!) }, 409);
       return json({ meta: meta(r!) });
     }
     if (!sub && m === 'DELETE') {

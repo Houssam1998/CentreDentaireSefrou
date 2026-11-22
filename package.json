@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-reviews.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -12,12 +13,14 @@
     "ig:render": "node instagram/scripts/render.mjs",
     "ig:reel": "node instagram/scripts/reel.mjs",
     "ig:build": "vite build --config instagram/vite.config.js",
-    "ig:check": "tsc -p instagram",
+    "ig:check": "tsc -p instagram && tsc -p instagram/worker",
     "ig:deploy": "npm run ig:build && wrangler d1 migrations apply DB --remote --config instagram/wrangler.jsonc && wrangler deploy --config instagram/wrangler.jsonc",
-    "ig:test": "node instagram/worker/auth.test.mjs && node instagram/scripts/regress.mjs && node instagram/scripts/e2e.mjs",
+    "ig:test": "node instagram/worker/auth.test.mjs && node instagram/worker/ai.test.mjs && node instagram/scripts/regress.mjs && node instagram/scripts/e2e.mjs && node instagram/scripts/e2e-wizard.mjs && node instagram/scripts/e2e-ai.mjs",
     "ig:cloud": "npm run ig:build && wrangler d1 migrations apply DB --local --config instagram/wrangler.jsonc && wrangler dev --config instagram/wrangler.jsonc --port 8788",
     "ig:setup": "node instagram/scripts/setup-cloud.mjs",
-    "ig:test:team": "node instagram/scripts/e2e-team.mjs"
+    "ig:test:team": "node instagram/scripts/e2e-team.mjs",
+    "site:check": "tsc -p site-worker",
+    "site:test": "node site-worker/reviews.test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -31,6 +34,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
     "@astrojs/check": "^0.9.10",
     "@cloudflare/workers-types": "^5.20261108.1",
     "@dnd-kit/core": "^6.3.1",

@@ -122,11 +122,19 @@ export interface Background {
   overlay?: number; // assombrissement 0..1 pour une photo de fond
 }
 
+/** Modèle et champs qui ont servi à créer une page (pour la « régénérer » avec d'autres réglages). */
+export interface PageSource {
+  template: string;
+  data: Record<string, string>;
+}
+
 export interface Page {
   id: string;
   tone: Tone;
   background: Background;
   elements: El[];
+  /** Absent pour une page faite à la main ou créée avant cette fonction. */
+  source?: PageSource;
 }
 
 export interface Project {

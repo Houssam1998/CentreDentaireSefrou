@@ -10,6 +10,7 @@ import { ContextToolbar } from './chrome/ContextToolbar';
 import { TopBar } from './chrome/TopBar';
 import { PagesStrip } from './chrome/PagesStrip';
 import { ProjectsDialog, CaptionDrawer, SyncBanner, openProject } from './chrome/Dialogs';
+import { NewPostWizard } from './chrome/NewPostWizard';
 import { detectCloud } from './store/cloud';
 import { Icon } from './ui/Icon';
 
@@ -72,6 +73,7 @@ export function App() {
       {!narrow ? <Inspector /> : null}
       {caption ? <CaptionDrawer onClose={() => setCaption(false)} /> : null}
       {projects ? <ProjectsDialog onClose={() => setProjects(false)} /> : null}
+      {!narrow ? <NewPostWizard /> : null}
     </div>
   );
 }

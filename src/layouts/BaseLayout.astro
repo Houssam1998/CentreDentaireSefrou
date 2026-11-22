@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer.astro';
 import MobileActionBar from '@/components/layout/MobileActionBar.astro';
 import WhatsAppFloat from '@/components/layout/WhatsAppFloat.astro';
 import { site, fullAddress } from '@/data/site';
+import { reviewStats } from '@/data/reviews';
 import { type Lang, treatmentPath, useT } from '@/i18n';
 import { treatments } from '@/data/treatments';
 import ogDefault from '@/assets/media/clinic/logo-wall.jpg';
@@ -67,7 +68,7 @@ const dentistSchema = {
     .map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.schema, opens: h.opens, closes: h.closes })),
   founder: { '@type': 'Person', name: site.doctorFull, image: new URL(doctorJpg.src, Astro.site).href, jobTitle: lang === 'fr' ? 'Chirurgien-dentiste' : 'Dental surgeon' },
   foundingDate: site.openedOn,
-  aggregateRating: { '@type': 'AggregateRating', ratingValue: site.stats.rating, reviewCount: site.stats.reviews, bestRating: 5 },
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: reviewStats.rating, reviewCount: reviewStats.count, bestRating: 5 },
   knowsLanguage: ['ar', 'fr', 'en'],
   sameAs: [...Object.values(site.social).filter((u) => new URL(u).pathname.length > 1), site.mapsUrl, site.bookingUrl],
   areaServed: site.areaServed.map((name) => ({ '@type': 'City', name })),

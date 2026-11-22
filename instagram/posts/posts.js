@@ -79,8 +79,8 @@ export const posts = [
     template: 'horaires',
     tone: 'greige',
     caption: {
-      fr: '🕘 Nos horaires\nDu lundi au vendredi : 09:00 – 13:00 et 15:00 – 19:00\nSamedi : 09:00 – 13:00\nDimanche : fermé\nPour un rendez-vous : 05 35 68 20 56 ou WhatsApp 06 66 06 02 15.\n(Enregistrez ce post pour l’avoir sous la main 📌)',
-      darija: '🕘 أوقات العمل\nمن الإثنين للجمعة: 09:00 – 13:00 و 15:00 – 19:00\nالسبت: 09:00 – 13:00\nالأحد: مسدود\nللموعد: 05 35 68 20 56 ولا واتساب 06 66 06 02 15',
+      fr: '🕘 Nos horaires\nDu lundi au vendredi : 09:00 – 18:00 (journée continue)\nSamedi : 09:00 – 13:00\nDimanche : fermé\nPour un rendez-vous : 05 35 68 20 56 ou WhatsApp 06 66 06 02 15.\n(Enregistrez ce post pour l’avoir sous la main 📌)',
+      darija: '🕘 أوقات العمل\nمن الإثنين للجمعة: 09:00 – 18:00 بلا توقف\nالسبت: 09:00 – 13:00\nالأحد: مسدود\nللموعد: 05 35 68 20 56 ولا واتساب 06 66 06 02 15',
     },
     hashtags: tags('#RendezVous'),
   },

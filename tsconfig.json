@@ -6,7 +6,8 @@
   ],
   "exclude": [
     "dist",
-    "instagram"
+    "instagram",
+    "site-worker"
   ],
   "compilerOptions": {
     "paths": {

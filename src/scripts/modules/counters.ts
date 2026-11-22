@@ -4,7 +4,6 @@ export function initCounters() {
   if (!els.length) return;
 
   const animate = (el: HTMLElement) => {
-    const end = Number(el.dataset.count);
     const decimals = Number(el.dataset.decimals ?? 0);
     const fmt = new Intl.NumberFormat(el.dataset.locale ?? 'fr-FR', {
       minimumFractionDigits: decimals,
@@ -15,7 +14,8 @@ export function initCounters() {
     const tick = (now: number) => {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-      el.textContent = fmt.format(end * eased);
+      // La cible est relue à chaque image : la note en direct (liveReviews.ts) peut arriver pendant l'animation
+      el.textContent = fmt.format(Number(el.dataset.count) * eased);
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);

@@ -8,6 +8,7 @@ import doctorStanding from '@/assets/media/clinic/doctor-standing.jpg';
 import doctorSeated from '@/assets/media/clinic/doctor-seated.jpg';
 import { type Lang, useT } from '@/i18n';
 import { site, whatsappLink } from '@/data/site';
+import { reviewStats } from '@/data/reviews';
 
 interface Props {
   lang: Lang;
@@ -102,11 +103,11 @@ const copy = {
       </div>
 
       <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-white/80" data-hero-line>
-        <a href={site.googleReviewsUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/10 py-2 pr-4 pl-3 backdrop-blur-md transition-colors hover:bg-white/15">
+        <a href="#avis" class="inline-flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/10 py-2 pr-4 pl-3 backdrop-blur-md transition-colors hover:bg-white/15">
           <span class="flex text-accent">
             {Array.from({ length: 5 }, () => <Icon name="star" class="size-4" />)}
           </span>
-          <span><strong class="font-semibold text-white">{site.stats.rating.toLocaleString(lang, { minimumFractionDigits: 1 })}</strong> · {site.stats.reviews} {t('rating.google')}</span>
+          <span><strong class="font-semibold text-white" data-reviews-rating>{reviewStats.rating.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> · <span data-reviews-count>{reviewStats.count}</span> {t('rating.google')}</span>
         </a>
         <span class="inline-flex items-center gap-2">
           <span class="h-px w-6 bg-accent"></span>

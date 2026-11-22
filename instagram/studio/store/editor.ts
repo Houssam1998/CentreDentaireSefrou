@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid';
 import type { El, NewEl, Page, Project, Format, Tone, Background } from '../model/types';
 import { FORMATS } from '../model/types';
 
-export type PanelId = 'templates' | 'elements' | 'text' | 'photos' | 'brand' | 'layers';
+export type PanelId = 'templates' | 'elements' | 'text' | 'photos' | 'brand' | 'layers' | 'assistant';
 
 export interface EditorState {
   project: Project;

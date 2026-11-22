@@ -10,9 +10,11 @@ import { importProjectFile, exportProjectFile } from '../export/export';
 import { FORMATS, type Format, type Project } from '../model/types';
 import { nanoid } from 'nanoid';
 import { Icon } from '../ui/Icon';
+import { openWizard } from './NewPostWizard';
+import { useAssistant } from '../ai/client';
 import { IconButton } from '../ui/controls';
 
-function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: React.ReactNode; wide?: boolean }) {
+export function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: React.ReactNode; wide?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -49,17 +51,24 @@ export function ProjectsDialog({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState('');
   useEffect(() => { if (cloud) pendingLocalCount().then(setPending).catch(() => setPending(0)); }, [cloud]);
 
-  const create = (f: Format) => { useEditor.getState().newProject(f); useEditor.temporal.getState().clear(); useCloud.setState({ current: null, conflict: null }); useEditor.getState().setPanel('templates'); onClose(); };
+  const aiBusy = useAssistant((s) => s.busy);
+  const create = (f: Format) => {
+    useEditor.getState().newProject(f); useEditor.temporal.getState().clear(); useCloud.setState({ current: null, conflict: null });
+    if (useEditor.getState().panel !== 'templates') useEditor.getState().setPanel('templates');
+    onClose();
+    // La publication guidée n'existe que sur ordinateur et tablette (l'éditeur est masqué sur téléphone)
+    if (!window.matchMedia('(max-width: 759px)').matches) openWizard();
+  };
   const guard = async (fn: () => Promise<void>) => { setErr(''); try { await fn(); } catch (x) { setErr((x as Error).message); } };
 
   return (
     <Modal title={cloud ? 'Créations de l’équipe' : 'Mes créations'} onClose={onClose} wide>
       <div className="row">
         {(Object.keys(FORMATS) as Format[]).map((f) => (
-          <button key={f} type="button" className="btn" onClick={() => create(f)}><Icon name="plus" size={16} /> {FORMATS[f].label}</button>
+          <button key={f} type="button" className="btn" disabled={aiBusy} onClick={() => create(f)}><Icon name="plus" size={16} /> {FORMATS[f].label}</button>
         ))}
         <span className="grow" />
-        <button type="button" className="btn" onClick={() => file.current?.click()}><Icon name="file" size={16} /> Ouvrir un fichier projet</button>
+        <button type="button" className="btn" disabled={aiBusy} onClick={() => file.current?.click()}><Icon name="file" size={16} /> Ouvrir un fichier projet</button>
         <button type="button" className="btn" onClick={() => guard(() => exportProjectFile(useEditor.getState().project))}><Icon name="download" size={16} /> Exporter la création ouverte</button>
         <input ref={file} type="file" accept=".json,application/json" hidden onChange={(e) => {
           const f = e.target.files?.[0];
@@ -86,6 +95,7 @@ export function ProjectsDialog({ onClose }: { onClose: () => void }) {
           })}>{busy || 'Les envoyer dans l’espace d’équipe'}</button>
         </div>
       ) : null}
+      {aiBusy ? <p className="sp-warn">L’assistant IA travaille sur la création ouverte : attendez qu’il ait fini pour en ouvrir ou en créer une autre.</p> : null}
       {err || listErr ? <p className="sp-warn">{err || listErr}</p> : null}
 
       {cloud ? (
@@ -99,7 +109,7 @@ export function ProjectsDialog({ onClose }: { onClose: () => void }) {
       <div className="projects">
         {(list ?? []).map((p) => (
           <div key={p.id} className={`proj${p.id === current ? ' on' : ''}`}>
-            <button type="button" className="proj-open" disabled={trash} onClick={() => guard(async () => { const full = await loadProjectById(p.id); if (full) { openProject(full); onClose(); } })}>
+            <button type="button" className="proj-open" disabled={trash || aiBusy} onClick={() => guard(async () => { const full = await loadProjectById(p.id); if (full) { openProject(full); onClose(); } })}>
               <span className={`proj-thumb f-${p.format}`}>{p.thumb ? <img src={p.thumb} alt="" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} /> : null}</span>
               <strong>{p.name}</strong>
               <small>{trash && p.deletedAt ? `Supprimée le ${when(p.deletedAt)}${p.deletedBy ? ` par ${who(p.deletedBy)}` : ''}` : `${when(p.updatedAt)}${p.updatedBy ? ` · ${who(p.updatedBy)}` : ''}`}</small>

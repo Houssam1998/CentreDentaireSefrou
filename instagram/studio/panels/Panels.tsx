@@ -1,10 +1,14 @@
 /** Panneaux de gauche : Modèles, Éléments, Texte, Photos, Marque, Calques. */
-import { memo, useEffect, useRef, useState, type ReactNode } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useEditor, usePage, currentPage, freshPage, type PanelId } from '../store/editor';
-import { importSlide } from '../model/importer';
+import { applySlides } from '../model/applySlides';
+import { upcoming, longDate, inDaysLabel } from '../model/calendar';
+import { openWizard } from '../chrome/NewPostWizard';
+import { AssistantPanel } from './AssistantPanel';
+import { OccasionIcon } from '../ui/OccasionIcon';
 import { TEXT_PRESETS, SHAPE_PRESETS, MOTIF_PRESETS, COMPONENT_ITEMS, ICON_NAMES, ICON_LABELS, iconSvg, type Preset } from '../model/presets';
 import { presetById, dragData } from './dnd';
 import { DND_TYPE, } from '../canvas/Artboard';
@@ -15,7 +19,7 @@ import { useCloud } from '../store/cloud';
 import { plainText } from '../model/sanitize';
 import { Icon } from '../ui/Icon';
 import { IconButton } from '../ui/controls';
-import { FORMATS, type El, type ImageEl, type NewEl, type Page, type Tone } from '../model/types';
+import { FORMATS, type El, type ImageEl, type NewEl, type Tone } from '../model/types';
 import { templates, renderSlide } from '../../templates/index.js';
 import { posts, slidesOf } from '../../posts/posts.js';
 
@@ -26,6 +30,7 @@ export const PANELS: { id: PanelId; label: string; icon: string }[] = [
   { id: 'photos', label: 'Photos', icon: 'photos' },
   { id: 'brand', label: 'Marque', icon: 'brand' },
   { id: 'layers', label: 'Calques', icon: 'layers' },
+  { id: 'assistant', label: 'Assistant IA', icon: 'sparkles' },
 ];
 
 export function LeftPanel({ id }: { id: PanelId }) {
@@ -43,6 +48,7 @@ export function LeftPanel({ id }: { id: PanelId }) {
         {id === 'photos' && <PhotosPanel />}
         {id === 'brand' && <BrandPanel />}
         {id === 'layers' && <LayersPanel />}
+        {id === 'assistant' && <AssistantPanel />}
       </div>
     </aside>
   );
@@ -102,14 +108,15 @@ const PresetPreview = memo(function PresetPreview({ els, tone, box = 92 }: { els
 /* Modèles                                                             */
 
 /** Rendu HTML d'un modèle, à l'échelle, dessiné seulement quand il devient visible. */
-const SlideThumb = memo(function SlideThumb({ slide, width = 128 }: { slide: Record<string, unknown>; width?: number }) {
+export const SlideThumb = memo(function SlideThumb({ slide, width = 128, eager = false }: { slide: Record<string, unknown>; width?: number; eager?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(eager);
   useEffect(() => {
+    if (eager) return;
     const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setShow(true); io.disconnect(); } }, { rootMargin: '200px' });
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
-  }, []);
+  }, [eager]);
   const tall = (templates as Record<string, { size: string }>)[slide.template as string]?.size === 'tall';
   const H = tall ? 1920 : 1350;
   const s = width / 1080;
@@ -120,41 +127,37 @@ const SlideThumb = memo(function SlideThumb({ slide, width = 128 }: { slide: Rec
   );
 });
 
-async function applySlides(slides: Record<string, unknown>[], post?: { caption?: { fr: string; darija: string }; hashtags?: string[]; date?: string; id?: string }) {
-  const st = useEditor.getState();
-  st.setStatus('Préparation du modèle…');
-  const pages: Page[] = [];
-  let format = st.project.format;
-  for (const s of slides) {
-    const r = await importSlide(s);
-    pages.push(r.page);
-    format = r.format;
-  }
-  const project = useEditor.getState().project;
-  const allEmpty = project.pages.every((p) => p.elements.length === 0);
-  if (allEmpty && format !== project.format) st.setFormat(format);
-  const page = currentPage();
-  if (page.elements.length === 0) {
-    st.replacePage(pages[0]);
-    if (pages.length > 1) st.insertPages(pages.slice(1));
-  } else {
-    st.insertPages(pages);
-  }
-  if (post && allEmpty) {
-    st.setMeta({ caption: post.caption ?? project.caption, hashtags: post.hashtags ?? project.hashtags, date: post.date ?? project.date });
-    if (project.name === 'Nouvelle création' && post.id) st.setName(post.id.replace(/^\d+-/, '').replace(/-/g, ' '));
-  }
-  st.setStatus(pages.length > 1 ? `${pages.length} pages ajoutées` : 'Modèle ajouté');
+/** Les deux prochaines occasions, avec un bouton pour préparer la publication. */
+function UpcomingOccasions() {
+  const next = useMemo(() => upcoming(2), []);
+  if (!next.length) return null;
+  return (
+    <Section title="Prochaines occasions">
+      <ul className="sp-occ">
+        {next.map((u) => (
+          <li key={u.key}>
+            <OccasionIcon occasion={u.key} />
+            <span className="grow"><strong>{u.label}</strong><small>{longDate(u.date)}{u.estimated ? ' (estimée)' : ''} · {inDaysLabel(u.inDays)}</small></span>
+            <button type="button" className="btn" onClick={() => openWizard({ template: 'fete', occasion: u.key })}>Préparer</button>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  );
 }
 
 function TemplatesPanel() {
   const mine = useMyTemplates();
   const format = useEditor((s) => s.project.format);
   const [busy, setBusy] = useState(false);
-  const run = async (fn: () => Promise<void>) => { if (busy) return; setBusy(true); try { await fn(); } finally { setBusy(false); } };
+  const run = async (fn: () => Promise<unknown>) => { if (busy) return; setBusy(true); try { await fn(); } finally { setBusy(false); } };
   return (
     <div className={busy ? 'busy' : ''}>
-      <p className="sp-hint">Cliquez sur un modèle : il s’ajoute comme nouvelle page (ou remplit la page vide). Tout reste ensuite modifiable.</p>
+      <button type="button" className="btn primary wide" onClick={() => openWizard()} data-guided>
+        <Icon name="sparkles" size={16} /> Nouvelle publication guidée
+      </button>
+      <UpcomingOccasions />
+      <p className="sp-hint">Ou cliquez sur un modèle : il s’ajoute comme nouvelle page (ou remplit la page vide). Tout reste ensuite modifiable.</p>
       {mine.length ? (
         <Section title="Mes modèles">
           <div className="grid2">

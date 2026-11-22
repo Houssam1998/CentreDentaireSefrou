@@ -23,3 +23,6 @@ Thumbs.db
 
 # Rapports Google Ads (données privées, le dépôt est public)
 /Suivi_google_ads/
+
+# Note et nombre d'avis Google relevés au moment du build (scripts/fetch-reviews.mjs)
+/src/data/reviews.generated.json

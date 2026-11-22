@@ -18,6 +18,7 @@ import { initVideoFacades } from './modules/videoFacade';
 import { initReveals } from './modules/reveal';
 import { initCounters } from './modules/counters';
 import { initAnalytics } from './modules/analytics';
+import { initLiveReviews } from './modules/liveReviews';
 
 const motionOk = document.documentElement.classList.contains('js-motion');
 
@@ -30,6 +31,7 @@ initContactForm();
 initMapFacade();
 initVideoFacades();
 initAnalytics();
+initLiveReviews();
 if (motionOk) {
   initReveals();
   initCounters();

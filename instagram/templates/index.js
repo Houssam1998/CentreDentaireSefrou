@@ -11,6 +11,7 @@ import { icons, arches, waves, flag, yaz, crescent, lantern, stars, logo } from 
 import { photoUrl } from '../brand/photos.js';
 import { md, rows, icon, head, badge, foot, frame, cornerWaves } from './parts.js';
 import QRCode from 'qrcode';
+import { OCCASIONS, OCCASION_OPTIONS, upcomingYear } from './occasions.js';
 
 const TONES = { light: 'Clair (ivoire)', greige: 'Grège (mur du cabinet)', night: 'Soirée (sombre)' };
 const SERIES = {
@@ -270,21 +271,10 @@ const localisation = {
   },
 };
 
-const OCCASIONS = {
-  independance: 'Fête de l’Indépendance (drapeau)',
-  trone: 'Fête du Trône (drapeau)',
-  marche: 'Marche Verte (drapeau)',
-  nouvelan: 'Nouvel An (année)',
-  yennayer: 'Yennayer (yaz amazigh)',
-  ramadan: 'Ramadan (croissant + lanterne)',
-  aid: 'Aïd (croissant)',
-  logo: 'Autre (logo du cabinet)',
-};
-
 const fete = {
   label: 'Fête / occasion',
   size: 'post',
-  fields: [F.tone, { k: 'occasion', label: 'Motif', type: 'select', options: OCCASIONS }, { k: 'big', label: 'Texte du motif (ex. 2027, 2977)', type: 'text' },
+  fields: [F.tone, { k: 'occasion', label: 'Occasion', type: 'select', options: OCCASION_OPTIONS }, { k: 'big', label: 'Texte du motif (ex. 2027, 2977)', type: 'text' },
     { k: 'titleFr', label: 'Titre (FR)', type: 'text' }, { k: 'titleAr', label: 'Titre calligraphié (AR)', type: 'ar' },
     { k: 'wishFr', label: 'Vœu (FR)', type: 'textarea' }, { k: 'wishAr', label: 'Vœu (AR)', type: 'ar' }, { k: 'signature', label: 'Signature', type: 'text' }],
   defaults: {
@@ -292,13 +282,18 @@ const fete = {
     wishFr: 'Bonne fête à toutes et à tous.', wishAr: 'كل عام والمغرب بخير', signature: 'Dr Amine El Omari et l’équipe',
   },
   render(d) {
-    const o = d.occasion;
+    // Le dessin de l'arche dépend de l'occasion (templates/occasions.js)
+    const o = OCCASIONS[d.occasion];
+    const kind = o?.motif ?? 'logo';
+    // Texte du motif laissé vide : l'année de la prochaine occurrence (Nouvel An → 2027, Yennayer → 2977)
+    const bigDefault = o?.big ? o.big(upcomingYear(d.occasion)) : '';
     let motif;
-    if (['independance', 'trone', 'marche'].includes(o)) motif = `<div class="ft-window flag">${flag(520)}</div>`;
-    else if (o === 'nouvelan') motif = `<div class="ft-window glow-arch"><span class="ft-big">${md(d.big || '2027')}</span><span class="ft-spark">${icons.sparkle}</span></div>`;
-    else if (o === 'yennayer') motif = `<div class="ft-window glow-arch"><span class="ft-yaz">${yaz}</span><span class="ft-num">${md(d.big || '2977')}</span></div>`;
-    else if (o === 'ramadan') motif = `<div class="ft-window glow-arch"><span class="ft-cres">${crescent}</span><span class="ft-lant">${lantern}</span></div>`;
-    else if (o === 'aid') motif = `<div class="ft-window glow-arch"><span class="ft-cres solo">${crescent}</span></div>`;
+    if (kind === 'flag') motif = `<div class="ft-window flag">${flag(520)}</div>`;
+    else if (kind === 'year') motif = `<div class="ft-window glow-arch"><span class="ft-big">${md(d.big || bigDefault)}</span><span class="ft-spark">${icons.sparkle}</span></div>`;
+    else if (kind === 'yaz') motif = `<div class="ft-window glow-arch"><span class="ft-yaz">${yaz}</span><span class="ft-num">${md(d.big || bigDefault)}</span></div>`;
+    else if (kind === 'ramadan') motif = `<div class="ft-window glow-arch"><span class="ft-cres">${crescent}</span><span class="ft-lant">${lantern}</span></div>`;
+    else if (kind === 'crescent') motif = `<div class="ft-window glow-arch"><span class="ft-cres solo">${crescent}</span></div>`;
+    else if (kind === 'tooth') motif = `<div class="ft-window glow-arch"><span class="ft-logo ft-ico">${icons.tooth}</span></div>`;
     else motif = `<div class="ft-window glow-arch"><span class="ft-logo">${logo.mark}</span></div>`;
     return frame({
       tone: d.tone,

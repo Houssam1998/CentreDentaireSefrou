@@ -1,0 +1,62 @@
+# Vérification automatique à chaque push et pull request (aucun secret, aucune mise en ligne).
+# Repère une erreur de code avant le déploiement : site (Astro), Worker des avis, Studio Instagram.
+name: Vérifications
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site-et-studio:
+    name: Site, Worker et Studio (types, build, tests unitaires)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Site — vérification TypeScript
+        run: npx astro check
+      - name: Site — build
+        run: npm run build
+      - name: Worker du site (avis Google) — types et tests
+        run: npm run site:check && npm run site:test
+      - name: Studio — types (éditeur + Worker)
+        run: npm run ig:check
+      - name: Studio — build
+        run: npm run ig:build
+      - name: Studio — tests de l'accès et de l'assistant IA (sans appel payant)
+        run: node instagram/worker/auth.test.mjs && node instagram/worker/ai.test.mjs
+
+  studio-navigateur:
+    name: Studio — parcours dans le navigateur
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Éditeur, publication guidée, assistant IA (service simulé)
+        run: node instagram/scripts/e2e.mjs && node instagram/scripts/e2e-wizard.mjs && node instagram/scripts/e2e-ai.mjs
+      - name: Captures en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures-e2e
+          path: instagram/export/_e2e/
+          retention-days: 7

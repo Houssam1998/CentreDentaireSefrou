@@ -17,6 +17,39 @@ Le Studio est fait pour un ordinateur ou une tablette. Sur téléphone, on peut 
 4. **Ajoutez** des formes, des arches lumineuses, des icônes, des motifs de fête, le logo, des pastilles de contact (téléphone, WhatsApp, adresse, Instagram, TikTok), des textes prêts ou vos photos. Un clic ajoute l'élément au centre ; on peut aussi le glisser sur la page. Les fichiers photo se déposent directement sur la page ou sur un cadre photo.
 5. **Télécharger** : PNG de la page, ZIP de toutes les pages pour un carrousel, ou fichier projet. Avant l'export, une vérification signale les mots qui ressemblent à de la publicité (prix, promo, %, « meilleur », « garanti »).
 
+### Nouvelle publication guidée (type et occasion)
+
+Le bouton **« Nouvelle publication guidée »** (panneau Modèles) s'ouvre aussi à chaque nouvelle création.
+1. **Choisissez le type** de publication : fête ou occasion, conseil, liste, vrai ou faux, comparatif, annonce, nos soins, horaires, localisation, avis patient, couverture de carrousel ou de reel.
+2. **Pour une fête, choisissez l'occasion**. Les textes du visuel en français et en arabe, la légende en français et en darija, les hashtags et la date conseillée se remplissent seuls. Les occasions proposées :
+   - fêtes nationales : Manifeste, Trône, 20 et 21 août, Marche Verte, Indépendance ;
+   - Nouvel An et Yennayer ;
+   - fêtes religieuses : Ramadan, Aïd al-Fitr, Aïd al-Adha, Nouvel An de l'Hégire, Mawlid ;
+   - le 20 mars, Journée mondiale de la santé bucco-dentaire.
+3. **Ajustez les textes** : l'aperçu se met à jour en direct. Cliquez ensuite sur **Créer la publication**. La page reste modifiable comme les autres.
+
+En haut de l'assistant et du panneau Modèles, **« Prochaines occasions »** affiche les 3 fêtes à venir avec un bouton **Préparer**. Les dates des fêtes religieuses sont des **estimations** (calendrier Umm al-Qura). Au Maroc, la fête tombe souvent un jour plus tard : confirmez la date selon l'observation du croissant.
+
+Une page créée ainsi se souvient de son modèle. Quand rien n'est sélectionné, l'inspecteur (à droite) affiche **« Changer l'occasion ou les textes »** pour la recréer avec d'autres réglages. Ctrl+Z revient en arrière.
+
+Les textes des occasions sont dans `templates/occasions.js`. **Les textes arabes et darija sont à relire par le Dr El Omari.**
+
+### Assistant IA (Claude)
+
+Panneau **« Assistant IA »** (dernière icône à gauche). Demandez en français ce que vous voulez, par exemple :
+- « Prépare la publication de la prochaine fête »
+- « Crée un conseil sur le brossage des dents »
+- « Le titre est trop long, raccourcis-le »
+- « Propose 3 légendes »
+- « Que penses-tu de ce visuel ? »
+
+Claude crée la page à partir des modèles de la charte, retouche les éléments, écrit la légende en français et en darija, regarde le rendu et vérifie les règles de déontologie.
+- Tout ce que l'IA a fait lors d'une demande s'annule d'un coup avec **« Annuler ce que l'IA a fait »** (ou Ctrl+Z).
+- Il ne crée pas de photos : il utilise les modèles, les éléments et les photos du cabinet déjà présents.
+- **Relisez toujours** les textes, surtout l'arabe et tout ce qui touche à la santé, avant de publier.
+
+L'assistant fonctionne dans le Studio en ligne et en local avec `npm run ig:cloud`. Il ne marche pas avec `ig:studio`, qui n'a pas de serveur. Sa mise en place est décrite plus bas.
+
 ### Pour aller plus loin
 
 - **Ambiance** (en haut) : Clair, Grège ou Soirée. Tout le projet change de couleurs de façon cohérente.
@@ -77,6 +110,22 @@ Le Studio est un Worker Cloudflare (`instagram/wrangler.jsonc`). Il sert l'édit
 
 **Publier une nouvelle version** : `npm run ig:deploy`.
 
+**Activer l'assistant IA** (une seule fois) :
+1. Sur **console.anthropic.com** :
+   - créez un compte de facturation, distinct de l'abonnement Claude.ai ;
+   - fixez une **limite de dépense mensuelle**, par exemple 20 $ (Settings → Limits) ;
+   - créez une **clé API**.
+2. Enregistrez la clé comme secret du Worker, avec `npx wrangler secret put ANTHROPIC_API_KEY --config instagram/wrangler.jsonc`. Elle n'est jamais écrite dans un fichier du dépôt. En local, ajoutez `ANTHROPIC_API_KEY=…` dans `instagram/.dev.vars`.
+3. Lancez `npm run ig:deploy`. Cette commande crée aussi la table de suivi de consommation (migration `0002_ai_usage.sql`).
+
+Réglages (`instagram/wrangler.jsonc` → `vars`) :
+- `AI_MODEL` : `claude-opus-5-5` par défaut. `claude-sonnet-5-5` coûte environ 2 fois moins cher, `claude-haiku-5-5` beaucoup moins, mais avec un résultat plus simple.
+- `AI_DAILY_LIMIT` : 200 échanges par personne et par jour par défaut. Une demande compte en général 2 à 5 échanges.
+
+**Coût indicatif** avec Opus 5.5 : environ 0,03 à 0,10 $ par demande, soit 5 à 10 $ pour 100 demandes par mois. La consommation de chaque personne est enregistrée jour par jour dans la table D1 `ai_usage`.
+
+**Sécurité** : la clé reste sur le serveur. Le navigateur ne choisit ni les consignes, ni le modèle, ni les outils. La route `/api/ai` exige la connexion Cloudflare Access, comme le reste de l'API.
+
 **Sécurité** :
 - Chaque appel à l'API vérifie la signature du jeton Access (`worker/auth.ts`, testé par `worker/auth.test.mjs`).
 - L'adresse `*.workers.dev` est désactivée.
@@ -97,42 +146,44 @@ Le Studio est un Worker Cloudflare (`instagram/wrangler.jsonc`). Il sert l'édit
 | `npm run ig:setup -- --emails … [--deploy]` | mise en place Cloudflare (base, connexion, adresses autorisées) |
 | `npm run ig:build` / `npm run ig:deploy` | construire / publier le Studio en ligne |
 | `npm run ig:cloud` | Studio + espace d'équipe en local (identité simulée) |
-| `npm run ig:check` | vérification TypeScript |
-| `npm run ig:test` | tests : sécurité de la connexion, fidélité des modèles importés, parcours complet de l'éditeur |
+| `npm run ig:check` | vérification TypeScript (éditeur + Worker) |
+| `npm run ig:test` | tests : sécurité de la connexion, relais de l'assistant IA, fidélité des modèles importés, parcours complet de l'éditeur, publication guidée, assistant IA (service simulé, sans frais) |
 | `npm run ig:test:team` | test à deux personnes de l'espace d'équipe (avec `ig:cloud` lancé) |
 
 ## Pour les développeurs
 
 ```
 studio/
-  model/      types (projet, page, éléments), jetons de couleur, importateur des modèles, variantes, préréglages
+  model/      types (projet, page, éléments), jetons de couleur, importateur des modèles, variantes, préréglages,
+              types de publication (postCategories/postTypes), calendrier des occasions, création de pages (applySlides)
+  ai/         assistant IA côté navigateur : outils (toolDefs = définitions, tools = exécution), état de la page, conversation
   store/      état (Zustand + annuler/rétablir zundo), sauvegarde (espace d'équipe ou IndexedDB), photos, API
   canvas/     rendu des éléments (aussi utilisé pour l'export), plan de travail, Moveable/Selecto
-  panels/     panneaux de gauche (Modèles, Éléments, Texte, Photos, Marque, Calques)
-  chrome/     barre du haut, barre contextuelle, inspecteur, pages, fenêtres
+  panels/     panneaux de gauche (Modèles, Éléments, Texte, Photos, Marque, Calques, Assistant IA)
+  chrome/     barre du haut, barre contextuelle, inspecteur, pages, fenêtres, publication guidée (NewPostWizard)
   export/     PNG, ZIP, fichier projet, vérifications
-templates/    les 13 modèles (HTML) — sources de l'importateur et de npm run ig:render
+templates/    les 13 modèles (HTML) — sources de l'importateur et de npm run ig:render ; occasions.js = fêtes et textes
 posts/        les 18 publications prêtes (textes, légendes, dates)
 reel/         outro animé (GSAP)
-worker/       Worker Cloudflare : API de l'espace d'équipe (D1), vérification Access, migrations SQL
+worker/       Worker Cloudflare : API de l'espace d'équipe (D1), vérification Access, migrations SQL,
+              relais de l'assistant IA (ai.ts, consignes dans aiPrompt.ts)
 ```
 
 L'éditeur est en HTML (pas en canvas), ce qui garde la mise en forme arabe du navigateur et les effets de lumière en CSS. L'**importateur** (`studio/model/importer.ts`) rend un modèle dans une page cachée puis convertit chaque bloc en élément libre. `scripts/regress.mjs` vérifie qu'un modèle importé reste identique à l'original (écart toléré : 1,5 % de pixels).
 
 ## Idées pour la suite
 
-- **20 mars** : Journée mondiale de la santé bucco-dentaire (carrousel « Vrai ou faux »).
-- **Aïd al-Fitr / Aïd al-Adha** : motif croissant.
+- Les fêtes et le 20 mars sont dans la publication guidée (voir plus haut). Pour le 20 mars, un carrousel « Vrai ou faux » peut compléter le visuel.
 - **Juin** : Festival des cerises de Sefrou (icône cerises), puis **22 juin 2027** : 1 an du cabinet.
-- **30 juillet** : Fête du Trône (drapeau).
 - **Reels / TikTok** : « Une journée au cabinet », « Comment se passe un détartrage », « Le scanner intra-oral en 20 s ». Filmez au téléphone, puis `npm run ig:reel -- --append video.mp4`.
 - Rythme conseillé : 2 publications par semaine et 1 reel toutes les 2 semaines (le même reel peut aller sur TikTok).
 
 ## À confirmer avant de publier
 
-- [ ] **Horaires** (encore marqués TODO dans `src/data/site.ts`).
+- [x] **Horaires** confirmés le 22/11/2026 (lun.–ven. 09:00–18:00, sam. 09:00–13:00).
 - [ ] Le compte Instagram **@centredentairesefrou** : à changer dans `config.js` s'il porte un autre nom.
 - [ ] **Avis patient** : accord de l'Ordre (un témoignage peut être assimilé à de la publicité).
 - [ ] **Repères de localisation** réels, vérifiés sur place.
-- [ ] Dates du **Ramadan** selon l'observation du croissant.
+- [ ] Dates du **Ramadan** et des Aïds selon l'observation du croissant.
+- [ ] Textes arabes et darija des occasions (`templates/occasions.js`), relus par le Dr El Omari.
 - [ ] Validation médicale des textes par le Dr Omari.

@@ -42,6 +42,11 @@ export const site = {
   /** Query used by the embedded map; resolves to the Google listing. */
   mapsQuery: 'Centre Dentaire Sefrou, N464 Derb El Miter, Sefrou 31000',
   googleReviewsUrl: 'https://maps.app.goo.gl/tCKEdeicvFQSDHrHA',
+  /**
+   * Google Place ID of the clinic (starts with "ChIJ…"). Used by the nightly refresh of the reviews
+   * (site-worker/) and by the "Laisser un avis" button. Empty = both stay off.
+   */
+  googlePlaceId: 'ChIJD38ZMvSbnw0RsmGdJ6YZI2M',
 
   /**
    * Exact GPS position of the clinic (from the Google Business Profile: right-click the pin → copy coordinates).
@@ -65,10 +70,10 @@ export const site = {
     conversions: { booking: '', whatsapp: '', call: '' },
   },
 
-  // TODO: vérifier les horaires
+  /** Horaires officiels (journée continue). `schema` = jours schema.org pour les données structurées. */
   hours: [
-    { days: { fr: 'Lundi – Vendredi', en: 'Monday – Friday' }, time: ['09:00 – 13:00', '15:00 – 19:00'], schema: ['Mo', 'Tu', 'We', 'Th', 'Fr'], opens: '09:00', closes: '19:00' },
-    { days: { fr: 'Samedi', en: 'Saturday' }, time: ['09:00 – 13:00'], schema: ['Sa'], opens: '09:00', closes: '13:00' },
+    { days: { fr: 'Lundi – Vendredi', en: 'Monday – Friday' }, time: ['09:00 – 18:00'], schema: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
+    { days: { fr: 'Samedi', en: 'Saturday' }, time: ['09:00 – 13:00'], schema: ['Saturday'], opens: '09:00', closes: '13:00' },
     { days: { fr: 'Dimanche', en: 'Sunday' }, time: null, schema: [], opens: null, closes: null },
   ],
 
@@ -84,7 +89,7 @@ export const site = {
     years: 5,
     trainings: 6,
     rating: 5,
-    reviews: 10, // nombre d'avis Google — à mettre à jour de temps en temps
+    reviews: 16, // nombre d'avis Google au 22/11/2026 (valeur de secours : le chiffre en direct vient de Google)
     openedYear: 2026,
   },
 } as const;

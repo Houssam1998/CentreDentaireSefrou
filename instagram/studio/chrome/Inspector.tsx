@@ -7,6 +7,10 @@ import { ColorPicker, IconButton, NumberField, Popover, Segmented, Slider } from
 import { layerName } from '../panels/Panels';
 import { saveMyTemplate } from '../store/persist';
 import { nanoid } from 'nanoid';
+import { typeOf } from '../model/postTypes';
+import { OCCASIONS } from '../../templates/occasions.js';
+import { openWizard } from './NewPostWizard';
+import { Icon } from '../ui/Icon';
 
 export const FONTS: { v: FontKey; label: string }[] = [
   { v: 'serif', label: 'Cormorant (titres)' },
@@ -250,12 +254,28 @@ function ComponentSettings({ el, tone }: { el: ComponentEl; tone: Tone }) {
   );
 }
 
+/** Page créée depuis un modèle : rappel du type (et de l'occasion) + bouton pour la régénérer. */
+function SourceSection({ template, data }: { template: string; data: Record<string, string> }) {
+  const type = typeOf(template);
+  const occasion = template === 'fete' ? OCCASIONS[data.occasion] : undefined;
+  return (
+    <section className="ins-sec" data-source>
+      <h3>Réglages de la publication</h3>
+      <p className="ins-src">{type?.title ?? template}{occasion ? ` · ${occasion.label}` : ''}</p>
+      <button type="button" className="btn wide" onClick={() => openWizard({ template, data, edit: true })}>
+        <Icon name="sparkles" size={16} /> {template === 'fete' ? 'Changer l’occasion ou les textes' : 'Modifier les textes'}
+      </button>
+    </section>
+  );
+}
+
 function PageInspector() {
   const page = usePage();
   const format = useEditor((s) => s.project.format);
   return (
     <aside className="inspector" aria-label="Réglages de la page">
       <header className="ins-head"><strong>Page</strong></header>
+      {page.source ? <SourceSection key={page.id} template={page.source.template} data={page.source.data} /> : null}
       <section className="ins-sec">
         <p className="sp-hint">Cliquez sur un élément pour le modifier. Glissez sur la page pour en sélectionner plusieurs. Maj+clic pour ajouter à la sélection.</p>
         <button type="button" className="btn wide" disabled={!page.elements.length} onClick={() => {
